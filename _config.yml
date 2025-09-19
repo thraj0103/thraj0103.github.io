@@ -7,20 +7,21 @@ baseurl: ''
 email: tekumalla.h@northeastern.edu
 # cover: https://bchiang7.github.io/img/og.png
 # logo: https://bchiang7.github.io/img/emojis/technologist.png
-# resume: https://bchiang7.github.io/resume.pdf
+resume: https://thraj0103.github.io/HemanthCV.pdf
 social:
   - title: email
     url: mailto:tekumalla.h@northeastern.edu
   # - title: twitter
   #   url: https://twitter.com/bchiang7
-  - title: instagram
-    url: https://instagram.com/thraj0103
-  # - title: codepen
-  #   url: http://codepen.io/bchiang7
   - title: github
     url: https://github.com/thraj0103
   - title: linkedin
     url: https://www.linkedin.com/in/thraj0103/
+  - title: instagram
+    url: https://instagram.com/thraj0103
+  # - title: codepen
+  #   url: http://codepen.io/bchiang7
+
 
 # Build settings
 markdown: kramdown
@@ -40,6 +41,10 @@ keep_files:
   - '.git'
   - '.gitignore'
 
-plugins_dir:
-  - jekyll-minifier
+# plugins_dir:
+#   - jekyll-minifier
+#   - jekyll-sitemap
+
+plugins:
   - jekyll-sitemap
+  - jekyll-minifier

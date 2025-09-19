@@ -3,7 +3,7 @@
   tech: [ROS 2, RTAB-Map, Particle Filter, TurtleBot3]
   # img: /img/projects/slam_thumb.jpg
   link: /assets/docs/Beacon_Based_Locatisation_for_Multi_Sensor_Fusion_SLAM.pdf
-  summary: Static beacons for drift correction in GNSS-denied settings; odometry+beacon fusion via particle filter; Gazebo/RViz eval vs. Cartographer.
+  description: Static beacons for drift correction in GNSS-denied settings; odometry+beacon fusion via particle filter; Gazebo/RViz eval vs. Cartographer.
 
 - name: Deep RL for Autonomous Racing (F1TENTH)
   role: Graduate Project

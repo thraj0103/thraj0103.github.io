@@ -1,3 +1,37 @@
+languages:
+  - item: Python
+  - item: C++
+  - item: MATLAB
+  - item: Bash/Shell
+
+Libraries:
+  - item: ROS 2
+  - item: PyTorch
+  - item: OpenCV
+  - item: YOLO
+  - item: NumPy
+  - item: Pandas
+  - item: Scikit-learn
+
+Tools & Platforms:
+  - item: Gazebo
+  - item: RViz
+  - item: RTAB-Map
+  - item: TurtleBot3
+  - item: F1TENTH Gym
+  - item: Simulink
+  - item: Git/GitHub
+  - item: Linux
+
+Robotics Focus:
+  - item: Perception
+  - item: Reinforcement Learning
+  - item: Path Planning
+  - item: SLAM
+  - item: Control (SMC)
+  - item: Sensor Fusion
+  - item: ILP (Gurobi)
+  
 # languages:
 #   - item: JavaScript (ES6)
 #   - item: TypeScript
@@ -32,11 +66,3 @@
 #   - item: Wireframing
 #   - item: User Testing
 
-- group: Programming
-  items: [Python, C++, MATLAB, Bash/Shell]
-- group: Libraries
-  items: [ROS 2, PyTorch, OpenCV, YOLO, NumPy, Pandas, Scikit-learn]
-- group: Tools & Platforms
-  items: [Gazebo, RViz, RTAB-Map, TurtleBot3, F1TENTH Gym, Simulink, Git/GitHub, Linux]
-- group: Robotics Focus
-  items: [Perception, Reinforcement Learning, Path Planning, SLAM, Control (SMC), Sensor Fusion, ILP (Gurobi)]
