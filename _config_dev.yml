@@ -5,8 +5,8 @@ description: Robotics — Perception · Learning-based Control · Planning · RO
 url: https://thraj0103.github.io/
 baseurl: ''
 email: tekumalla.h@northeastern.edu
-# cover: https://bchiang7.github.io/img/og.png
-# logo: https://bchiang7.github.io/img/emojis/technologist.png
+cover: https://thraj0103.github.io/img/og.png
+logo: https://thraj0103.github.io/img/emojis/technologist.png
 resume: https://thraj0103.github.io/HemanthCV.pdf
 social:
   - title: email

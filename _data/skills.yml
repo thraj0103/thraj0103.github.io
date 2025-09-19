@@ -2,35 +2,40 @@ languages:
   - item: Python
   - item: C++
   - item: MATLAB
-  - item: Bash/Shell
+  # - item: Bash/Shell
 
-Libraries:
+library:
   - item: ROS 2
-  - item: PyTorch
+  - item: PyTorch/Tensorflow
+  - item: Scikit-learn
   - item: OpenCV
   - item: YOLO
+  - item: PIL/Pillow
   - item: NumPy
+  - item: SciPy
+  - item: Jupyter
+  - item: Matplotlib
   - item: Pandas
-  - item: Scikit-learn
+  - item: GurobiPy
 
-Tools & Platforms:
+
+tools:
   - item: Gazebo
   - item: RViz
-  - item: RTAB-Map
   - item: TurtleBot3
-  - item: F1TENTH Gym
+  - item: Gymnasium
   - item: Simulink
   - item: Git/GitHub
   - item: Linux
 
-Robotics Focus:
+interests:
   - item: Perception
   - item: Reinforcement Learning
-  - item: Path Planning
+  - item: Motion Planning
   - item: SLAM
-  - item: Control (SMC)
+  - item: Control Theory
   - item: Sensor Fusion
-  - item: ILP (Gurobi)
+
   
 # languages:
 #   - item: JavaScript (ES6)
