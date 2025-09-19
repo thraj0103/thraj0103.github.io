@@ -1,33 +1,42 @@
-languages:
-  - item: JavaScript (ES6)
-  - item: TypeScript
-  - item: HTML
-  - item: CSS/Sass
-  - item: Python
-  - item: SQL
-  - item: R
+# languages:
+#   - item: JavaScript (ES6)
+#   - item: TypeScript
+#   - item: HTML
+#   - item: CSS/Sass
+#   - item: Python
+#   - item: SQL
+#   - item: R
 
-frameworks:
-  - item: Ember & Glimmer
-  - item: React
-  - item: Jekyll
-  - item: Node
-  - item: D3
-  - item: Wordpress
-  - item: Timber
+# frameworks:
+#   - item: Ember & Glimmer
+#   - item: React
+#   - item: Jekyll
+#   - item: Node
+#   - item: D3
+#   - item: Wordpress
+#   - item: Timber
 
-tools:
-  - item: Bash
-  - item: Git & Github
-  - item: Gulp & Grunt
-  - item: Chrome DevTools
-  - item: Postman
-  - item: MongoDB
+# tools:
+#   - item: Bash
+#   - item: Git & Github
+#   - item: Gulp & Grunt
+#   - item: Chrome DevTools
+#   - item: Postman
+#   - item: MongoDB
 
-design:
-  - item: Sketch
-  - item: InDesign
-  - item: InVision
-  - item: Prototyping
-  - item: Wireframing
-  - item: User Testing
+# design:
+#   - item: Sketch
+#   - item: InDesign
+#   - item: InVision
+#   - item: Prototyping
+#   - item: Wireframing
+#   - item: User Testing
+
+- group: Programming
+  items: [Python, C++, MATLAB, Bash/Shell]
+- group: Libraries
+  items: [ROS 2, PyTorch, OpenCV, YOLO, NumPy, Pandas, Scikit-learn]
+- group: Tools & Platforms
+  items: [Gazebo, RViz, RTAB-Map, TurtleBot3, F1TENTH Gym, Simulink, Git/GitHub, Linux]
+- group: Robotics Focus
+  items: [Perception, Reinforcement Learning, Path Planning, SLAM, Control (SMC), Sensor Fusion, ILP (Gurobi)]
