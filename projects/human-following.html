@@ -1,0 +1,92 @@
+---
+layout: default
+title: Human-Aware Navigation with TurtleBot3
+permalink: /projects/human-following.html
+---
+
+<section class="section project-detail">
+
+  <!-- Project Header -->
+  <div class="section__title">Human-Following Robot with TurtleBot3</div>
+
+  <!-- Two-column Layout -->
+  <div style="display:flex; gap:2rem; align-items:flex-start; flex-wrap:wrap;">
+
+    <!-- Left Column: Text -->
+    <div style="flex:2; min-width:300px;">
+      <p>
+        I built a perception–control pipeline on a <strong>TurtleBot3 Waffle-Pi</strong> that ties together
+        <strong>real-time perception</strong>, <strong>LiDAR–camera fusion</strong>, and
+        <strong>closed-loop control</strong> using <strong>ROS&nbsp;2 Foxy</strong>. The robot detects and tracks a person,
+        estimates the person’s angle and distance relative to the robot, and generates smooth velocity commands.
+        An observer-based monitor runs in parallel to flag anomalies and faults early.
+      </p>
+  
+      <h3>System Architecture</h3>
+      <ul>
+        <li><strong>Perception:</strong> <em>YOLOv8</em> detects people; <em>DeepSORT</em> keeps the same ID across frames.</li>
+        <li><strong>Sensor Fusion:</strong> Camera detections are associated with <em>LiDAR</em> returns to estimate
+            the person’s direction and distance in real time.</li>
+        <li><strong>Control:</strong> Implemented and compared a baseline feedback-linearization controller with
+            a <em>Sliding Mode Controller (SMC)</em>; SMC was chosen for human-following because it stayed smooth
+            and stable under noise and brief occlusions.</li>
+        <li><strong>Anomaly Detection:</strong> A sliding-mode style observer estimates the robot’s state and compares
+            it with sensors; adaptive thresholds raise a fault flag for drift, mis-tuned gains, or stealthy issues.</li>
+        <li><strong>Integration:</strong> Modular ROS&nbsp;2 nodes (vision → fusion → control → diagnostics) with RViz/Gazebo tooling.</li>
+      </ul>
+  
+      <h3>Perception &amp; Fusion</h3>
+      <ul>
+        <li>YOLOv8 runs at real-time rates; DeepSORT keeps stable IDs through short occlusions.</li>
+        <li>Fusion publishes the person’s position relative to the robot by combining camera boxes and LiDAR scans.</li>
+        <li>Diagnostics topics expose detections, tracks, and pose estimates for fast debugging in RViz.</li>
+      </ul>
+  
+      <h3>Closed-Loop Control</h3>
+      <ul>
+        <li><strong>Feedback Linearization (baseline):</strong> validated on circular and sinusoidal test paths in Gazebo.</li>
+        <li><strong>SMC for Following:</strong> computes forward and turning commands from tracking errors; produced smoother paths
+            and better disturbance rejection in practice.</li>
+        <li><strong>I/O:</strong> Inputs include odometry, IMU yaw, and fused person pose; output is <code>/cmd_vel</code>.</li>
+      </ul>
+  
+      <h3>Anomaly Detection</h3>
+      <p>
+        The observer predicts what the robot’s state should be and compares it to sensor readings. When the difference
+        grows beyond an adaptive threshold, the node flags a potential problem—useful for catching sensor drift or
+        over-aggressive gains before behavior degrades.
+      </p>
+  
+      <h3>Experiments</h3>
+      <ul>
+        <li><strong>Simulation:</strong> Gazebo for controller bring-up, trajectory tests, and end-to-end checks.</li>
+        <li><strong>Hardware:</strong> Hallway trials on TurtleBot3 confirmed stable following and recovery after brief occlusions.</li>
+      </ul>
+  
+      <h3>Results</h3>
+      <ul>
+        <li>Reliable person detection and tracking with IDs maintained through short occlusions.</li>
+        <li>SMC delivered smoother motion than the baseline and handled sensor noise well.</li>
+        <li>The observer correctly flagged injected faults (e.g., too-high gains), enabling safe intervention.</li>
+      </ul>
+  
+      <h3>Stack</h3>
+      <p>ROS&nbsp;2 Foxy · Python/C++ · OpenCV · PyTorch · YOLOv8 · DeepSORT · LiDAR · IMU · Gazebo · RViz · TurtleBot3</p>
+  
+    </div>
+
+    <!-- Right Column: Video -->
+    <div style="flex:1; max-width:360px; min-width:280px;">
+      <video
+          id="human-following-video"
+          autoplay muted loop playsinline preload="auto" controls
+          onloadedmetadata="this.defaultPlaybackRate=2.0; this.playbackRate=2.0;"
+          onplay="this.playbackRate=2.0"
+          style="width:100%; height:auto; border-radius:8px; background:#000; aspect-ratio:9/16;">
+          <source src="{{ site.baseurl }}/video/human-following-720p.mp4" type="video/mp4">
+          Sorry, your browser doesn’t support embedded videos.
+        </video>
+    </div>
+
+  </div>
+</section>

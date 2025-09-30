@@ -1,0 +1,72 @@
+---
+layout: default
+title: Adversarial Robustness in Vision-Based Robot Navigation
+permalink: /projects/adversarial-vision.html
+---
+
+<section class="section project-detail">
+
+  <!-- Project Header -->
+  <div class="section__title">Adversarial Robustness in Vision-Based Robot Navigation</div>
+
+  <!-- Two-column Layout -->
+  <div style="display:flex; gap:2rem; align-items:flex-start; flex-wrap:wrap;">
+
+    <!-- Left Column: Text -->
+    <div style="flex:2; min-width:300px;">
+      <p>
+        I evaluated how small, black-box perturbations can suppress object detections critical to robot navigation,
+        and tested practical defenses that run in real time without retraining the model. Using <strong>YOLOv8</strong> on the
+        <strong>nuScenes</strong> dataset, the focus was on people, vehicles, and bicycles—classes that directly impact safety.
+      </p>
+
+      <h3>What I Built</h3>
+      <ul>
+        <li><strong>Attack:</strong> A targeted random perturbation (L∞-bounded) that seeks to reduce critical detections.</li>
+        <li><strong>Defenses (no retraining):</strong> Gaussian blur, JPEG compression, bit-depth reduction, random resize+pad.</li>
+        <li><strong>Pipeline:</strong> PyTorch + Ultralytics YOLOv8 with OpenCV preprocessing, Jupyter notebooks for analysis.</li>
+      </ul>
+
+      <h3>Experiments</h3>
+      <ul>
+        <li><strong>Data:</strong> nuScenes mini (front camera frames from varied urban scenarios).</li>
+        <li><strong>Metrics:</strong> Critical object suppression rate, recovery rate under defense, and per-image latency (ms).</li>
+        <li><strong>Setup:</strong> Real-time budget target &lt; 10&nbsp;ms per defense step on laptop-class hardware.</li>
+      </ul>
+
+      <h3>Key Results</h3>
+      <ul>
+        <li><strong>Suppression:</strong> Up to <strong>53.1%</strong> critical objects suppressed at <code>ε = 0.1</code>; about <strong>25.3%</strong> at subtle <code>ε = 0.04</code>.</li>
+        <li><strong>Defense:</strong> <strong>Gaussian blur</strong> restored <strong>62.9%</strong> of lost detections with <strong>8.46&nbsp;ms</strong> overhead (within real-time budget).</li>
+        <li>Random resize and JPEG provided partial recovery; bit-reduction helped but less than blur.</li>
+      </ul>
+
+      <h3>Takeaways</h3>
+      <ul>
+        <li>Standard accuracy metrics hide worst-case failures; perception stacks need explicit robustness checks.</li>
+        <li>Simple preprocessing can buy safety margin on embedded systems without touching the model weights.</li>
+      </ul>
+
+      <h3>Stack</h3>
+      <p>Python · PyTorch · Ultralytics YOLOv8 · OpenCV · NumPy/Pandas · Matplotlib · Jupyter</p>
+    </div>
+
+    <!-- Right Column: Media -->
+    <div style="flex:1; max-width:360px; min-width:280px;">
+      <!-- Use a short clip or side-by-side frame -->
+      <video autoplay muted loop playsinline preload="auto" controls
+             onloadedmetadata="this.defaultPlaybackRate=1.0; this.playbackRate=1.0;"
+             style="width:100%; height:auto; border-radius:8px; background:#000; aspect-ratio:16/9;">
+        <source src="{{ site.baseurl }}/video/adversarial-vision-demo.mp4" type="video/mp4">
+        Sorry, your browser doesn’t support embedded videos.
+      </video>
+
+      <!-- If you don’t have a video yet, comment the <video> above and use an image like this:
+      <img src="{{ site.baseurl }}/img/featured/adversarial-vision/clean-vs-adv-vs-defended.jpg"
+           alt="Clean vs adversarial vs defended detections"
+           style="width:100%; height:auto; border-radius:8px;">
+      -->
+    </div>
+
+  </div>
+</section>

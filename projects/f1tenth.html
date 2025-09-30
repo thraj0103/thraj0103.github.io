@@ -1,0 +1,44 @@
+---
+layout: default
+title: Deep Reinforcement Learning for Autonomous Racing (F1TENTH)
+permalink: /projects/f1tenth.html
+---
+
+<section class="section project-detail">
+  <div class="section__title">Deep Reinforcement Learning for Autonomous Racing (F1TENTH)</div>
+
+  <div style="display:flex; gap:2rem; align-items:flex-start; flex-wrap:wrap;">
+    <div style="flex:2; min-width:300px;">
+      <p>
+        I applied <strong>deep reinforcement learning</strong> to train autonomous racing agents on the
+        <strong>F1TENTH platform</strong>. The objective was to push high-speed performance while keeping stable control.
+        Agents were trained in simulation and validated on physical hardware.
+      </p>
+
+      <h3>Methodology</h3>
+      <ul>
+        <li>Used <strong>Proximal Policy Optimization (PPO)</strong> and <strong>Soft Actor–Critic (SAC)</strong> algorithms.</li>
+        <li>Designed <strong>reward shaping</strong> for speed, track adherence, and overtaking.</li>
+        <li>Implemented <strong>curriculum learning</strong> to gradually increase track complexity.</li>
+        <li>Applied <strong>domain randomization</strong> for robustness when transferring from sim to real.</li>
+      </ul>
+
+      <h3>Results</h3>
+      <ul>
+        <li>Agents achieved competitive lap times in Gazebo simulations.</li>
+        <li>Successfully transferred to physical F1TENTH cars with minimal tuning.</li>
+        <li>Stable lane keeping and overtaking maneuvers under dynamic conditions.</li>
+      </ul>
+
+      <h3>Stack</h3>
+      <p>Python · PyTorch · Stable-Baselines3 · ROS 2 · Gazebo · F1TENTH</p>
+    </div>
+
+    <div style="flex:1; max-width:360px; min-width:280px;">
+      <video autoplay muted loop playsinline controls
+             style="width:100%; height:auto; border-radius:8px; background:#000; aspect-ratio:16/9;">
+        <source src="{{ site.baseurl }}/video/f1tenth-demo.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</section>

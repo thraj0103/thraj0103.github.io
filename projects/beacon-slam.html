@@ -1,0 +1,72 @@
+---
+layout: default
+title: Beacon-Based Localization for Multi-Sensor Fusion SLAM
+permalink: /projects/beacon-slam.html
+---
+
+<section class="section project-detail">
+  <!-- Project Header (left blue title stays intact) -->
+  <div class="section__title">Beacon-Based Localization for Multi-Sensor Fusion SLAM</div>
+
+  <!-- Two-column Layout (text left, media right) -->
+  <div style="display:flex; gap:2rem; align-items:flex-start; flex-wrap:wrap;">
+
+    <!-- Left Column: Text -->
+    <div style="flex:2; min-width:300px;">
+      <p>
+        I integrated a <strong>beacon-based global correction</strong> module into an RTAB-Map SLAM pipeline in <strong>ROS 2</strong>
+        to handle <strong>GNSS-denied</strong> and feature-sparse environments. A <strong>particle filter</strong> fuses wheel/IMU odometry
+        with distance measurements from fixed beacons to correct drift and stabilize the robot’s global pose.
+      </p>
+
+      <h3>System Architecture</h3>
+      <ul>
+        <li><strong>SLAM Backbone:</strong> RTAB-Map (RGB-D/LiDAR) for online mapping and loop closure.</li>
+        <li><strong>Beacon Layer:</strong> Static beacons broadcast IDs; the robot subscribes to range messages.</li>
+        <li><strong>Fusion:</strong> Particle filter combines odometry + beacon ranges for pose correction.</li>
+        <li><strong>Integration:</strong> ROS 2 nodes for beacon I/O, fusion, and TF corrections feeding back into SLAM.</li>
+      </ul>
+
+      <h3>Fusion Details</h3>
+      <ul>
+        <li>Propagate particles with odometry; weight by range residuals to known beacon locations.</li>
+        <li>Resample and publish the corrected pose to the SLAM graph for drift mitigation.</li>
+        <li>Tuned update rates to maintain real-time performance on TurtleBot3 class hardware.</li>
+      </ul>
+
+      <h3>Evaluation</h3>
+      <ul>
+        <li><strong>Simulation:</strong> Gazebo + RViz on TurtleBot3 with configurable beacon layouts.</li>
+        <li><strong>Comparisons:</strong> RTAB-Map alone vs. RTAB-Map + beacons; Cartographer (LiDAR-only) as reference.</li>
+      </ul>
+
+      <h3>Results</h3>
+      <ul>
+        <li>Reduced long-term drift and better trajectory alignment when visual features were sparse or repetitive.</li>
+        <li>Stable global pose under occlusions and partial loop-closure failures.</li>
+      </ul>
+
+      <h3>Stack</h3>
+      <p>ROS 2 · RTAB-Map · Particle Filter · LiDAR/RGB-D · TF · Gazebo · RViz · TurtleBot3</p>
+    </div>
+
+    <!-- Right Column: Media (image or video) -->
+    <div style="flex:1; max-width:360px; min-width:280px;">
+      <!-- If you have a short demo video, keep this. Otherwise swap for an image tag. -->
+      <video
+        autoplay muted loop playsinline preload="auto" controls
+        onloadedmetadata="this.defaultPlaybackRate=1.0; this.playbackRate=1.0;"
+        style="width:100%; height:auto; border-radius:8px; background:#000; aspect-ratio:16/9;">
+        <source src="{{ site.baseurl }}/video/beacon-slam-demo.mp4" type="video/mp4">
+        Sorry, your browser doesn’t support embedded videos.
+      </video>
+
+      <!-- Fallback image (uncomment if no video)
+      <img src="{{ site.baseurl }}/img/featured/beacon-slam/overlay-map-rtabmap.jpg"
+           alt="RTAB-Map with beacon correction overlay"
+           style="width:100%; height:auto; border-radius:8px; margin-top:0;">
+      -->
+    </div>
+
+  </div>
+</section>
