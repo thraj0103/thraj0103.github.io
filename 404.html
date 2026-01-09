@@ -1,10 +1,12 @@
 ---
-layout: not_found
-title: 404
+layout: default
+title: 404 - Page Not Found
 permalink: /404.html
 ---
-{% include switch.html %}
-<div class="name">Brittany Chiang</div>
-<img src="{{site.baseurl}}/img/emojis/thinking-face.png" alt="">
-<h1>Hmmm...</h1>
-<h2>Looks like there's nothing here.<br>Maybe you should go back <a href="{{site.url}}">home</a>.</h2>
+
+<div class="container" style="text-align: center; padding: 150px 0;">
+    <h1 class="glow-text" style="font-size: 5rem; margin-bottom: 20px;">404</h1>
+    <h2 style="color: #ffd700;">Protocol Missing</h2>
+    <p>The page you are looking for has been moved, deleted, or never existed.</p>
+    <a href="{{ " /" | relative_url }}" class="btn btn--primary" style="margin-top: 30px;">Return to Base</a>
+</div>

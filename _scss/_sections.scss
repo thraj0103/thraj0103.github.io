@@ -1,0 +1,168 @@
+section {
+    padding: 100px 0;
+    position: relative;
+}
+
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding-top: 100px;
+
+    &__content {
+        max-width: 800px;
+        z-index: 2;
+    }
+
+    &__subtitle {
+        font-family: $font-mono;
+        color: $accent;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        display: block;
+    }
+
+    &__actions {
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+
+    @media (max-width: 600px) {
+        grid-template-columns: 1fr;
+    }
+
+    .project-card {
+        @extend .card;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+
+        &__image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: $radius;
+            margin-bottom: 20px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .tags {
+            margin-top: auto;
+            padding-top: 20px;
+        }
+    }
+}
+
+.experience-list {
+    max-width: 800px;
+    margin: 0 auto;
+
+    .job-item {
+        @extend .card;
+        margin-bottom: 30px;
+
+        &__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+
+            h3 {
+                margin-bottom: 0;
+                color: $white;
+            }
+
+            .company-link {
+                color: $primary;
+                font-weight: 700;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+
+                &:hover {
+                    text-decoration: underline;
+                    color: $accent;
+
+                    .external-icon {
+                        transform: translate(2px, -2px);
+                    }
+                }
+
+                .external-icon {
+                    font-size: 0.8em;
+                    transition: transform 0.2s ease;
+                }
+            }
+
+            .company {
+                color: $primary;
+                font-weight: 700;
+            }
+
+            .time {
+                font-family: $font-mono;
+                color: $text-secondary;
+                font-size: 0.9rem;
+            }
+        }
+
+        // End of __header
+
+        .responsibilities {
+            margin-top: 15px;
+            color: $text-secondary;
+
+            .responsibility-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                margin-bottom: 8px;
+                font-size: 0.95rem;
+
+                .arrow {
+                    color: $accent;
+                    font-size: 0.8rem;
+                    margin-top: 4px; // Align visually with text line-height
+                    flex-shrink: 0;
+                }
+            }
+        }
+    }
+}
+
+.grid-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        linear-gradient(rgba($primary, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba($primary, 0.03) 1px, transparent 1px);
+    background-size: 30px 30px;
+    z-index: -2;
+    pointer-events: none;
+    mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+}

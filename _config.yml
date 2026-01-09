@@ -1,12 +1,12 @@
 # Site settings
 name: Hemanth Raj Tekumalla
 title: Hemanth Raj Tekumalla | MS in Robotics @ Northeastern University
-description: Robotics — Perception · Learning-based Control · Planning · ROS 2
+description: Robotics Engineer | MS in Robotics @ Northeastern University | Perception · SLAM · Learning-based Control · Path Planning · ROS 2
 url: https://thraj0103.github.io/
 baseurl: ''
 email: tekumalla.h@northeastern.edu
-# cover: https://bchiang7.github.io/img/og.png
-# logo: https://bchiang7.github.io/img/emojis/technologist.png
+cover: https://thraj0103.github.io/img/og-image.png
+logo: /img/favicon.png
 resume: https://thraj0103.github.io/HemanthCV.pdf
 social:
   - title: email
@@ -25,6 +25,11 @@ social:
 
 # Build settings
 markdown: kramdown
+
+# Sass configuration
+sass:
+  sass_dir: _scss
+  style: compressed
 
 exclude:
   - 'Gemfile'

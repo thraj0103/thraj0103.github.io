@@ -4,39 +4,47 @@ title: Medical Endoscopy Simulation with Hardware-in-the-Loop RL
 permalink: /projects/endoscopy.html
 ---
 
-<section class="section project-detail">
-  <div class="section__title">Medical Endoscopy Simulation with Hardware-in-the-Loop RL</div>
+<div class="project-nav">
+  <a href="{{ " /" | relative_url }}#projects" class="back-link">← Back to Projects</a>
+</div>
 
-  <div style="display:flex; gap:2rem; align-items:flex-start; flex-wrap:wrap;">
-    <div style="flex:2; min-width:300px;">
-      <p>
-        At the <strong>Experimental Soft Robotics Lab (ESL)</strong>, I worked on developing a simulation framework for
-        <strong>robotic endoscopy</strong>. The goal was to improve <strong>fiber-scanning patterns</strong> while
-        accounting for physical constraints like <strong>photobleaching</strong>.
-      </p>
 
-      <h3>Contributions</h3>
-      <ul>
-        <li>Modeled fiber-scanning endoscopy system dynamics in simulation.</li>
-        <li>Implemented <strong>hardware-in-the-loop RL</strong> to optimize scanning policies.</li>
-        <li>Tested methods to minimize photobleaching while maintaining image quality.</li>
-        <li>Collaborated with lab members on integrating real hardware with the simulation loop.</li>
-      </ul>
 
-      <h3>Outcomes</h3>
-      <ul>
-        <li>Pipeline established for connecting RL controllers to real endoscopy prototypes.</li>
-        <li>Promising early results on improved scan efficiency and reduced photobleaching effects.</li>
-      </ul>
+<div class="container project-detail-container">
+  <div class="project-detail">
+    <h1>Medical Endoscopy Simulation with Hardware-in-the-Loop RL</h1>
 
-      <h3>Stack</h3>
-      <p>Python · PyTorch · RL · Simulation · Hardware-in-the-Loop</p>
-    </div>
+    <div class="project-layout">
+      <div class="project-content">
+        <p>
+          At the <strong>Experimental Soft Robotics Lab (ESL)</strong>, I worked on developing a simulation framework
+          for
+          <strong>robotic endoscopy</strong>. The goal was to improve <strong>fiber-scanning patterns</strong> while
+          accounting for physical constraints like <strong>photobleaching</strong>.
+        </p>
 
-    <div style="flex:1; max-width:360px; min-width:280px;">
-      <img src="{{ site.baseurl }}/img/featured/endoscopy/simulation.jpg"
-           alt="Endoscopy simulation environment"
-           style="width:100%; height:auto; border-radius:8px;">
+        <h3>Contributions</h3>
+        <ul>
+          <li>Modeled fiber-scanning endoscopy system dynamics in simulation.</li>
+          <li>Implemented <strong>hardware-in-the-loop RL</strong> to optimize scanning policies.</li>
+          <li>Tested methods to minimize photobleaching while maintaining image quality.</li>
+          <li>Collaborated with lab members on integrating real hardware with the simulation loop.</li>
+        </ul>
+
+        <h3>Outcomes</h3>
+        <ul>
+          <li>Pipeline established for connecting RL controllers to real endoscopy prototypes.</li>
+          <li>Promising early results on improved scan efficiency and reduced photobleaching effects.</li>
+        </ul>
+
+        <h3>Stack</h3>
+        <div class="tech-stack">Python · PyTorch · RL · Simulation · Hardware-in-the-Loop</div>
+      </div>
+
+      <div class="project-media">
+        <img src="{{ site.baseurl }}/img/featured/endoscopy/simulation.jpg" alt="Endoscopy simulation environment"
+          style="width:100%; height:auto; border-radius:8px;">
+      </div>
     </div>
   </div>
-</section>
+</div>

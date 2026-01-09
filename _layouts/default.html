@@ -1,13 +1,20 @@
----
-layout: compress
----
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  {% include head.html %}
+    {% include head.html %}
 </head>
+
 <body>
-  {{ content }}
-  {% include scripts.html %}
+
+    {% include header.html %}
+
+    <main>
+        {{ content }}
+    </main>
+
+    {% include footer.html %}
+
 </body>
+
 </html>

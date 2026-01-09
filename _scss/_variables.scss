@@ -1,0 +1,31 @@
+// Iron Man Theme - Variables
+
+// Colors
+$primary: #dc0a0a; // Iron Man Red
+$primary-dark: #a00000;
+$accent: #ffd700; // Gold / Arc Reactor Core
+$accent-dim: #b8860b;
+$arc-blue: #00d9ff; // Reactor Blue Glow
+$background: #0a0a0a; // Deep Space Black
+$surface: #151515; // Metal Dark
+$surface-light: #202020;
+$text: #ffffff;
+$white: #ffffff;
+$text-secondary: #b0b0b0;
+
+// Gradients
+$gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+$gradient-gold: linear-gradient(135deg, $accent 0%, #ffec8b 100%);
+
+// Typography
+$font-heading: 'Montserrat', sans-serif;
+$font-body: 'Roboto', 'Inter', sans-serif;
+$font-mono: 'Inconsolata', monospace;
+
+// Spacing
+$container-width: 1200px;
+$padding-mobile: 20px;
+$padding-desktop: 40px;
+
+// Border Radius
+$radius: 12px;

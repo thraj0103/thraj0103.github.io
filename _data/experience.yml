@@ -2,11 +2,22 @@
   url: https://www.nuesl.org/
   time: Nov 2024 – Present
   position: Research Assistant (MS)
+  responsibilities:
+    - Developing hardware-in-the-loop reinforcement learning pipeline for medical endoscopy fiber scanning optimization
+    - Implemented integer linear programming solver using Gurobi, reducing enabled pulses from 65% to 45% and mean pulse/pixel by 28%
+    - Built simulation framework integrating Gaussian beam evaluation models with RL agents for real-time scanning pattern optimization
+    - Designing experiments to validate sim-to-real transfer on physical fiber scanning hardware
 
 - company: Centre for Robotics & Security in IoT, IIIT Pune
   url: https://iiitp.ac.in/page/research-consultancy4
   time: May 2023 – Jul 2023
   position: Research Intern — Robotics
+  responsibilities:
+    - Developed real-time human detection and tracking system using YOLOv8 and DeepSORT on TurtleBot3 platform
+    - Implemented LiDAR-camera sensor fusion pipeline for robust 3D person localization in dynamic environments
+    - Designed and deployed sliding mode controller (SMC) for smooth human-following behavior with disturbance rejection
+    - Built observer-based anomaly detection system to flag sensor drift and control instabilities in real-time
+    - Validated complete perception-control pipeline in Gazebo simulation and hardware deployment
 
 # - company: Upstatement
 #   url: https://www.upstatement.com/

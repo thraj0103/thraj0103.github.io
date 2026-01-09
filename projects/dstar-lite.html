@@ -4,66 +4,77 @@ title: Dynamic Obstacle Avoidance with D* Lite (ROS 2 Nav2)
 permalink: /projects/dstar-lite.html
 ---
 
-<section class="section project-detail">
+<div class="project-nav">
+  <a href="{{ " /" | relative_url }}#projects" class="back-link">← Back to Projects</a>
+</div>
 
-  <!-- Project Header -->
-  <div class="section__title">Dynamic Obstacle Avoidance with D* Lite (ROS 2 Nav2)</div>
 
-  <!-- Two-column Layout -->
-  <div style="display:flex; gap:2rem; align-items:flex-start; flex-wrap:wrap;">
 
-    <!-- Left Column: Text -->
-    <div style="flex:2; min-width:300px;">
-      <p>
-        I implemented a <strong>D* Lite</strong> global planner as a <strong>ROS 2 Navigation2</strong> plugin to handle
-        dynamic environments. The planner incrementally repairs paths as the costmap changes, so the robot can keep moving
-        while obstacles appear, disappear, or shift. This avoids full re-plans and keeps latency low.
-      </p>
+<div class="container project-detail-container">
+  <div class="project-detail">
 
-      <h3>Planner Design</h3>
-      <ul>
-        <li><strong>Nav2 Plugin:</strong> clean interface with lifecycle nodes and standard planner API.</li>
-        <li><strong>Incremental Updates:</strong> D* Lite maintains state keys and reuses previous search work.</li>
-        <li><strong>Priority Queue:</strong> custom cell-based queue for fast key updates and lookups.</li>
-        <li><strong>Dynamic Costmap:</strong> subscribes to layered costmap updates (inflation/obstacles) in real time.</li>
-        <li><strong>Smoothing:</strong> simple post-processing for curvature and collision margin improvements.</li>
-      </ul>
+    <!-- Project Header -->
+    <h1>Dynamic Obstacle Avoidance with D* Lite (ROS 2 Nav2)</h1>
 
-      <h3>Scenarios &amp; Testing</h3>
-      <ul>
-        <li><strong>Sudden obstacles:</strong> object drops onto the path → planner repairs route around it.</li>
-        <li><strong>Occluded obstacles:</strong> obstacle revealed late by sensors → incremental update avoids last-second stops.</li>
-        <li><strong>Close-proximity obstacles:</strong> tight spaces with changing gaps → stable re-planning without oscillation.</li>
-      </ul>
+    <!-- Two-column Layout -->
+    <div class="project-layout">
 
-      <h3>Results</h3>
-      <ul>
-        <li>Consistent real-time re-planning under changing costmaps without full restarts.</li>
-        <li>Smoother, feasible paths after light post-processing.</li>
-        <li>Cleaner Nav2 integration (configurable via YAML; works with standard costmap layers).</li>
-      </ul>
+      <!-- Left Column: Text -->
+      <div class="project-content">
+        <p>
+          I implemented a <strong>D* Lite</strong> global planner as a <strong>ROS 2 Navigation2</strong> plugin to
+          handle
+          dynamic environments. The planner incrementally repairs paths as the costmap changes, so the robot can keep
+          moving
+          while obstacles appear, disappear, or shift. This avoids full re-plans and keeps latency low.
+        </p>
 
-      <h3>Stack</h3>
-      <p>ROS 2 · Navigation2 · D* Lite · Dynamic Costmaps · Gazebo · RViz · TurtleBot3</p>
-    </div>
+        <h3>Planner Design</h3>
+        <ul>
+          <li><strong>Nav2 Plugin:</strong> clean interface with lifecycle nodes and standard planner API.</li>
+          <li><strong>Incremental Updates:</strong> D* Lite maintains state keys and reuses previous search work.</li>
+          <li><strong>Priority Queue:</strong> custom cell-based queue for fast key updates and lookups.</li>
+          <li><strong>Dynamic Costmap:</strong> subscribes to layered costmap updates (inflation/obstacles) in real
+            time.</li>
+          <li><strong>Smoothing:</strong> simple post-processing for curvature and collision margin improvements.</li>
+        </ul>
 
-    <!-- Right Column: Media -->
-    <div style="flex:1; max-width:360px; min-width:280px;">
-      <!-- Use a short demo if available; else swap to an image -->
-      <video autoplay muted loop playsinline preload="auto" controls
-             onloadedmetadata="this.defaultPlaybackRate=1.0; this.playbackRate=1.0;"
-             style="width:100%; height:auto; border-radius:8px; background:#000; aspect-ratio:16/9;">
-        <source src="{{ site.baseurl }}/video/dstar-lite-demo.mp4" type="video/mp4">
-        Sorry, your browser doesn’t support embedded videos.
-      </video>
+        <h3>Scenarios &amp; Testing</h3>
+        <ul>
+          <li><strong>Sudden obstacles:</strong> object drops onto the path → planner repairs route around it.</li>
+          <li><strong>Occluded obstacles:</strong> obstacle revealed late by sensors → incremental update avoids
+            last-second stops.</li>
+          <li><strong>Close-proximity obstacles:</strong> tight spaces with changing gaps → stable re-planning without
+            oscillation.</li>
+        </ul>
 
-      <!-- Fallback image (uncomment if no video) -->
-      <!--
+        <h3>Results</h3>
+        <ul>
+          <li>Consistent real-time re-planning under changing costmaps without full restarts.</li>
+          <li>Smoother, feasible paths after light post-processing.</li>
+          <li>Cleaner Nav2 integration (configurable via YAML; works with standard costmap layers).</li>
+        </ul>
+
+        <h3>Stack</h3>
+        <div class="tech-stack">ROS 2 · Navigation2 · D* Lite · Dynamic Costmaps · Gazebo · RViz · TurtleBot3</div>
+      </div>
+
+      <!-- Right Column: Media -->
+      <div class="project-media">
+        <!-- Use a short demo if available; else swap to an image -->
+        <video autoplay muted loop playsinline preload="auto" controls>
+          <source src="{{ site.baseurl }}/video/dstar-lite-demo.mp4" type="video/mp4">
+          Sorry, your browser doesn’t support embedded videos.
+        </video>
+
+        <!-- Fallback image (uncomment if no video) -->
+        <!--
       <img src="{{ site.baseurl }}/img/featured/dstar-lite/rviz-path-replan.jpg"
            alt="D* Lite re-planning around a moving obstacle in RViz/Gazebo"
-           style="width:100%; height:auto; border-radius:8px; margin-top:0;">
+           >
       -->
-    </div>
+      </div>
 
+    </div>
   </div>
-</section>
+</div>
