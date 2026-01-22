@@ -23,7 +23,7 @@ section {
 
     &__terminal {
         font-family: $font-mono;
-        font-size: clamp(0.75rem, 0.8vw + 0.3rem, 1rem); // Responsive: scales from 0.75rem to 1rem
+        font-size: #{"clamp(0.75rem, 0.8vw + 0.3rem, 1rem)"}; // Responsive: scales from 0.75rem to 1rem
         line-height: 1.8;
         color: $silver;
 
