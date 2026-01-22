@@ -8,13 +8,16 @@ h6 {
     font-weight: 700;
     color: $text;
     margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em; // Tracking for technical look
 }
 
 h1 {
     font-size: 3.5rem;
     line-height: 1.1;
-    text-transform: uppercase;
-    letter-spacing: -1px;
+    letter-spacing: 0.05em;
+    color: $cyan;
+    text-shadow: 0 0 20px rgba(102, 252, 241, 0.5); // Cyan glow
 
     @media (max-width: 768px) {
         font-size: 2.5rem;
@@ -22,12 +25,13 @@ h1 {
 }
 
 h2 {
-    font-size: 2.5rem;
-    color: $primary;
+    font-size: 2rem;
+    color: $cyan;
     margin-bottom: 2rem;
     position: relative;
     display: inline-block;
     padding-right: 0;
+    text-shadow: 0 0 10px rgba(102, 252, 241, 0.3); // Subtle glow
 
     &::after {
         content: '';
@@ -35,9 +39,9 @@ h2 {
         bottom: -10px;
         left: 0;
         width: 100%;
-        height: 2px;
-        background: linear-gradient(90deg, $accent 0%, $accent 70%, transparent 70%, transparent 75%, $accent 75%, $accent 100%);
-        box-shadow: 0 0 8px rgba($accent, 0.4);
+        height: 1px;
+        background: $teal;
+        box-shadow: 0 0 8px rgba($cyan, 0.4);
     }
 }
 

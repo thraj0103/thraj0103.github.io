@@ -1,37 +1,32 @@
-<section id="about" class="hero">
+<section id="hero" class="hero">
     <div class="grid-bg"></div>
 
-
-    <div class="hero__content">
-        <h1 class="hero__hello" style="font-size: 2rem; color: #fff; margin-bottom: 20px;">
-            Hello! <span class="emoji wave-hand"
-                style="display: inline-block; animation: wave 2.5s infinite; transform-origin: 70% 70%;">👋</span>
-        </h1>
-
-        <h2 style="font-size: 2.5rem; line-height: 1.3;">
-            I'm <span class="glow-text">Hemanth Raj Tekumalla</span>, a Robotics Engineer specializing in
-            <strong style="color: #dc0a0a;">perception</strong>,
-            <strong style="color: #dc0a0a;">learning-based control</strong>, and
-            <strong style="color: #dc0a0a;">autonomous systems</strong>.
-        </h2>
-
-        <p
-            style="font-size: 1.2rem; margin-top: 20px; max-width: 700px; margin-left: auto; margin-right: auto; margin-bottom: 40px;">
-            I build robots that navigate, learn, and adapt to complex environments.
-            <span style="font-size: 1.2rem;">👨‍💻</span>
-        </p>
-
-        <!-- Background text moved to separate section below -->
-
-        <div class="hero__contact"
-            style="margin-top: 30px; font-family: 'Inconsolata', monospace; font-size: 1.1rem; color: #b0b0b0;">
-            <a href="mailto:{{ site.email }}" style="color: #ffd700; border-bottom: 1px solid #dc0a0a;">{{ site.email
-                }}</a>
+    <div class="hero__content hero__terminal">
+        <div class="terminal-line">
+            <span class="prompt">&gt;</span> SYSTEM ONLINE
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">&gt;</span> LOADING PROFILE: <span class="highlight">HEMANTH RAJ TEKUMALLA</span>
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">&gt;</span> STATUS: MS ROBOTICS @ NORTHEASTERN UNIVERSITY
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">&gt;</span> SPECIALIZATION: <span class="spec">PERCEPTION</span> | <span
+                class="spec">STATE ESTIMATION</span> | <span class="spec">MOTION PLANNING</span> | <span
+                class="spec">CONTROLS</span> | <span class="spec">MATHEMATICAL OPTIMIZATION</span>
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">&gt;</span> MISSION: BUILDING INTELLIGENT SYSTEMS THAT PERCEIVE, LEARN & ADAPT
         </div>
 
-        <div class="hero__actions" style="margin-top: 40px;">
-            <a href="{{ site.resume }}" target="_blank" class="btn btn--primary">
-                <span>Download Resume</span>
+        <div class="hero__contact">
+            <span class="prompt">&gt;</span> CONTACT: <a href="mailto:{{ site.email }}">{{ site.email }}</a>
+        </div>
+
+        <div class="hero__actions">
+            <a href="{{ site.resume }}" target="_blank" class="btn btn--hud">
+                <span>[ DOWNLOAD RESUME ]</span>
             </a>
         </div>
     </div>

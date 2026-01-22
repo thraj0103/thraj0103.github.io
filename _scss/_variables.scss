@@ -1,26 +1,35 @@
-// Iron Man Theme - Variables
+// J.A.R.V.I.S. HUD Interface - Variables
 
-// Colors
-$primary: #dc0a0a; // Iron Man Red
-$primary-dark: #a00000;
-$accent: #ffd700; // Gold / Arc Reactor Core
-$accent-dim: #b8860b;
-$arc-blue: #00d9ff; // Reactor Blue Glow
-$background: #0a0a0a; // Deep Space Black
-$surface: #151515; // Metal Dark
-$surface-light: #202020;
-$text: #ffffff;
-$white: #ffffff;
-$text-secondary: #b0b0b0;
+// Colors - Cyber Industrial
+$void: #0B0C10; // Deep void background
+$gunmetal: #1F2833; // Gunmetal grey containers
+$steel: #2C3E50; // Steel grey elevated surfaces
+$silver: #C5C6C7; // Silver text
+$white: #FFFFFF;
+
+// Accents - Arc Reactor Energy
+$cyan: #66FCF1; // Electric cyan (primary accent)
+$teal: #45A29E; // Muted teal (secondary)
+$amber: #FFA500; // Warning/alert color
+$cyan-dim: rgba(102, 252, 241, 0.6);
+
+// Semantic Colors
+$primary: $cyan;
+$accent: $teal;
+$background: $void;
+$surface: $gunmetal;
+$surface-light: $steel;
+$text: $silver;
+$text-secondary: rgba(197, 198, 199, 0.7);
 
 // Gradients
-$gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
-$gradient-gold: linear-gradient(135deg, $accent 0%, #ffec8b 100%);
+$gradient-card: linear-gradient(135deg, rgba(102, 252, 241, 0.03) 0%, rgba(69, 162, 158, 0.01) 100%);
+$gradient-cyan: linear-gradient(135deg, $cyan 0%, $teal 100%);
 
-// Typography
-$font-heading: 'Montserrat', sans-serif;
-$font-body: 'Roboto', 'Inter', sans-serif;
-$font-mono: 'Inconsolata', monospace;
+// Typography - Monospace/Terminal
+$font-heading: 'Rajdhani', 'Orbitron', monospace;
+$font-body: 'Roboto Mono', 'Fira Code', 'Courier New', monospace;
+$font-mono: 'Roboto Mono', 'Courier New', monospace;
 
 // Spacing
 $container-width: 1200px;
@@ -28,4 +37,4 @@ $padding-mobile: 20px;
 $padding-desktop: 40px;
 
 // Border Radius
-$radius: 12px;
+$radius: 2px; // Sharp, technical corners

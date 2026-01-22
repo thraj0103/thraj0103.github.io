@@ -7,27 +7,73 @@ section {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
+    justify-content: flex-start; // Left-align for terminal
+    text-align: left;
     padding-top: 100px;
+    padding-left: 10%;
+
+    @media (max-width: 768px) {
+        padding-left: 5%;
+    }
 
     &__content {
-        max-width: 800px;
+        max-width: 1100px; // Increased to utilize more screen space
         z-index: 2;
     }
 
-    &__subtitle {
+    &__terminal {
         font-family: $font-mono;
-        color: $accent;
-        font-size: 1.2rem;
-        margin-bottom: 20px;
-        display: block;
+        font-size: clamp(0.75rem, 0.8vw + 0.3rem, 1rem); // Responsive: scales from 0.75rem to 1rem
+        line-height: 1.8;
+        color: $silver;
+
+        .terminal-line {
+            margin-bottom: 8px;
+            font-weight: 400;
+
+            .prompt {
+                color: $cyan;
+                font-weight: 700;
+                margin-right: 8px;
+                text-shadow: 0 0 8px rgba(102, 252, 241, 0.4);
+            }
+
+            .highlight {
+                color: $cyan;
+                font-weight: 700;
+                text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+            }
+
+            .spec {
+                color: $teal;
+                font-weight: 600;
+            }
+        }
+    }
+
+    &__contact {
+        margin-top: 30px;
+        font-family: $font-mono;
+        font-size: 1rem;
+        color: $text-secondary;
+
+        a {
+            color: $cyan;
+            border-bottom: 1px solid $teal;
+            transition: all 0.3s ease;
+
+            &:hover {
+                color: $white;
+                border-bottom-color: $cyan;
+                text-shadow: 0 0 8px rgba(102, 252, 241, 0.6);
+            }
+        }
     }
 
     &__actions {
         margin-top: 40px;
         display: flex;
-        justify-content: center;
+        justify-content: flex-start;
         gap: 20px;
     }
 }
@@ -47,6 +93,50 @@ section {
         height: 100%;
         display: flex;
         flex-direction: column;
+        position: relative;
+
+        // L-Bracket Targeting Corners
+        &::before,
+        &::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid $cyan;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        // Top-left bracket
+        &::before {
+            top: 0;
+            left: 0;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        // Bottom-right bracket
+        &::after {
+            bottom: 0;
+            right: 0;
+            border-left: none;
+            border-top: none;
+        }
+
+        &:hover {
+
+            &::before,
+            &::after {
+                border-color: $white;
+                box-shadow: 0 0 10px rgba($cyan, 0.6);
+            }
+
+            .project-card__image {
+                // Reveal full color on card hover
+                filter: grayscale(0%) sepia(0%) hue-rotate(0deg) brightness(1);
+                transform: scale(1.02);
+            }
+        }
 
         &__image {
             width: 100%;
@@ -54,12 +144,10 @@ section {
             object-fit: cover;
             border-radius: $radius;
             margin-bottom: 20px;
-            opacity: 0.8;
-            transition: opacity 0.3s ease;
+            transition: all 0.4s ease;
 
-            &:hover {
-                opacity: 1;
-            }
+            // Desaturate and apply cyan tint (holographic look)
+            filter: grayscale(70%) sepia(30%) hue-rotate(150deg) brightness(0.9);
         }
 
         h3 {
@@ -159,8 +247,8 @@ section {
     width: 100%;
     height: 100%;
     background-image:
-        linear-gradient(rgba($primary, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba($primary, 0.03) 1px, transparent 1px);
+        linear-gradient(rgba($cyan, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba($cyan, 0.02) 1px, transparent 1px);
     background-size: 30px 30px;
     z-index: -2;
     pointer-events: none;

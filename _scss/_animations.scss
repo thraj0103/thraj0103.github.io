@@ -60,34 +60,87 @@
     }
 }
 
+// 3D Wireframe Grid Animation
+@keyframes gridMove {
+    0% {
+        transform: translateY(0) rotateX(60deg);
+    }
+
+    100% {
+        transform: translateY(50px) rotateX(60deg);
+    }
+}
+
 // Classes
 .glow-text {
     color: $accent;
     text-shadow: 0 0 10px rgba($accent, 0.6);
 }
 
-.arc-reactor-bg {
+// 3D Wireframe Grid Background (SLAM/Mapping Style)
+.wireframe-grid {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60vh;
-    height: 60vh;
-    background: radial-gradient(circle, rgba($arc-blue, 0.1) 0%, transparent 70%);
-    border-radius: 50%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    perspective: 1000px;
+    overflow: hidden;
     z-index: -1;
     pointer-events: none;
 
     &::before {
         content: '';
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 60%;
-        height: 60%;
-        border: 2px solid rgba($arc-blue, 0.2);
-        border-radius: 50%;
-        animation: pulse 4s infinite;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background-image:
+            repeating-linear-gradient(0deg,
+                transparent,
+                transparent 49px,
+                rgba($cyan, 0.08) 49px,
+                rgba($cyan, 0.08) 50px),
+            repeating-linear-gradient(90deg,
+                transparent,
+                transparent 49px,
+                rgba($cyan, 0.08) 49px,
+                rgba($cyan, 0.08) 50px);
+        transform: rotateX(60deg) translateZ(-100px);
+        animation: gridMove 20s linear infinite;
+    }
+
+    // Subtle scan line effect
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(to bottom,
+                transparent,
+                rgba($cyan, 0.3),
+                transparent);
+        animation: scanline 8s linear infinite;
+        opacity: 0.5;
+    }
+}
+
+
+// Point Cloud Canvas Background (Interactive JS-based)
+.point-cloud {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+
+    canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
     }
 }
