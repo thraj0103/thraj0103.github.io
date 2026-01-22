@@ -2,27 +2,41 @@
     <div class="grid-bg"></div>
 
     <div class="hero__content hero__terminal">
-        <div class="terminal-line">
-            <span class="prompt">&gt;</span> SYSTEM ONLINE
-        </div>
-        <div class="terminal-line">
-            <span class="prompt">&gt;</span> LOADING PROFILE: <span class="highlight">HEMANTH RAJ TEKUMALLA</span>
-        </div>
-        <div class="terminal-line">
-            <span class="prompt">&gt;</span> STATUS: MS ROBOTICS @ NORTHEASTERN UNIVERSITY
-        </div>
-        <div class="terminal-line">
-            <span class="prompt">&gt;</span> SPECIALIZATION: <span class="spec">PERCEPTION</span> | <span
-                class="spec">STATE ESTIMATION</span> | <span class="spec">MOTION PLANNING</span> | <span
-                class="spec">CONTROLS</span> | <span class="spec">MATHEMATICAL OPTIMIZATION</span>
-        </div>
-        <div class="terminal-line">
-            <span class="prompt">&gt;</span> MISSION: BUILDING INTELLIGENT SYSTEMS THAT PERCEIVE, LEARN & ADAPT
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-title">TERMINAL_ACCESS // THRAJ0103</div>
+                <div class="terminal-controls">
+                    <span class="control minimize"></span>
+                    <span class="control maximize"></span>
+                    <span class="control close"></span>
+                </div>
+            </div>
+            <div class="terminal-body">
+                <div class="terminal-line">
+                    <span class="prompt">&gt;</span> SYSTEM ONLINE
+                </div>
+                <div class="terminal-line">
+                    <span class="prompt">&gt;</span> LOADING PROFILE: <span class="highlight">HEMANTH RAJ
+                        TEKUMALLA</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="prompt">&gt;</span> STATUS: MS ROBOTICS @ NORTHEASTERN UNIVERSITY
+                </div>
+                <div class="terminal-line">
+                    <span class="prompt">&gt;</span> SPECIALIZATION: <span class="spec">PERCEPTION</span> | <span
+                        class="spec">STATE ESTIMATION</span> | <span class="spec">MOTION PLANNING</span> | <span
+                        class="spec">CONTROLS</span> | <span class="spec">MATHEMATICAL OPTIMIZATION</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="prompt">&gt;</span> MISSION: BUILDING INTELLIGENT SYSTEMS THAT PERCEIVE, LEARN & ADAPT
+                </div>
+                <div class="hero__contact" style="margin-top: 20px;">
+                    <span class="prompt">&gt;</span> CONTACT: <a href="mailto:{{ site.email }}">{{ site.email }}</a>
+                </div>
+            </div>
         </div>
 
-        <div class="hero__contact">
-            <span class="prompt">&gt;</span> CONTACT: <a href="mailto:{{ site.email }}">{{ site.email }}</a>
-        </div>
+
 
         <div class="hero__actions">
             <a href="{{ site.resume }}" target="_blank" class="btn btn--hud">
