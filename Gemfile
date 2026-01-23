@@ -1,5 +1,4 @@
 source 'https://rubygems.org'
-gem 'jekyll', '~> 4.0'
-gem 'jekyll-sass-converter'
-gem 'jekyll-sitemap'
-gem 'jekyll-minifier'
+
+# GitHub Pages standard gems
+gem 'github-pages', group: :jekyll_plugins
