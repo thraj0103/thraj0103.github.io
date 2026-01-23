@@ -7,13 +7,13 @@ section {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: flex-start; // Left-align for terminal
-    text-align: left;
+    justify-content: center; // Center align for terminal and button
+    text-align: center; // Center text content within the flex container
     padding-top: 100px;
-    padding-left: 10%;
+    padding-left: 0; // Removed 10% padding to align with header container
 
     @media (max-width: 768px) {
-        padding-left: 5%;
+        padding-left: 0;
     }
 
     &__content {
@@ -39,6 +39,7 @@ section {
             max-width: 1100px;
             width: 100%;
             margin-bottom: 30px;
+            text-align: left; // Keep terminal text left-aligned
 
             .terminal-header {
                 display: flex;
@@ -164,7 +165,7 @@ section {
     &__actions {
         margin-top: 40px;
         display: flex;
-        justify-content: flex-start;
+        justify-content: center; // Center align buttons
         gap: 20px;
     }
 }
