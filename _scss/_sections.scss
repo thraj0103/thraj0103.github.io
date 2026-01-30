@@ -186,41 +186,71 @@ section {
         display: flex;
         flex-direction: column;
         position: relative;
+        padding: 0;
+        overflow: hidden;
+
+        // Subtle scanline/grid texture
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba($cyan, 0.03) 2px,
+                    rgba($cyan, 0.03) 4px);
+            pointer-events: none;
+            z-index: 1;
+        }
 
         // L-Bracket Targeting Corners
-        &::before,
         &::after {
             content: '';
             position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 2px solid $cyan;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid transparent;
+            pointer-events: none;
             z-index: 2;
+
+            // Top-left corner
+            background:
+                linear-gradient($cyan, $cyan) 0 0 / 20px 2px no-repeat,
+                linear-gradient($cyan, $cyan) 0 0 / 2px 20px no-repeat,
+                // Bottom-right corner
+                linear-gradient($cyan, $cyan) 100% 100% / 20px 2px no-repeat,
+                linear-gradient($cyan, $cyan) 100% 100% / 2px 20px no-repeat;
+
             transition: all 0.3s ease;
         }
 
-        // Top-left bracket
-        &::before {
-            top: 0;
-            left: 0;
-            border-right: none;
-            border-bottom: none;
-        }
-
-        // Bottom-right bracket
-        &::after {
-            bottom: 0;
-            right: 0;
-            border-left: none;
-            border-top: none;
-        }
-
         &:hover {
-
-            &::before,
             &::after {
-                border-color: $white;
-                box-shadow: 0 0 10px rgba($cyan, 0.6);
+                background:
+                    linear-gradient($white, $white) 0 0 / 20px 2px no-repeat,
+                    linear-gradient($white, $white) 0 0 / 2px 20px no-repeat,
+                    linear-gradient($white, $white) 100% 100% / 20px 2px no-repeat,
+                    linear-gradient($white, $white) 100% 100% / 2px 20px no-repeat;
+                filter: drop-shadow(0 0 8px rgba($cyan, 1)) drop-shadow(0 0 15px rgba($cyan, 0.8)) drop-shadow(0 0 3px rgba($white, 0.9));
+            }
+
+            .status-led {
+                background: $cyan !important;
+                box-shadow: 0 0 10px rgba($cyan, 0.8), 0 0 20px rgba($cyan, 0.4) !important;
+            }
+
+            .status-indicator .status-default {
+                display: none !important;
+            }
+
+            .status-indicator .status-hover {
+                display: inline !important;
             }
 
             .project-card__image {
@@ -230,29 +260,150 @@ section {
             }
         }
 
+        // Mission Header Bar
+        .mission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba($void, 0.5);
+            border-bottom: 1px solid rgba($cyan, 0.2);
+            font-family: $font-mono;
+            font-size: 0.75rem;
+            position: relative;
+            z-index: 3;
+
+            .status-indicator {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: $silver;
+
+                .status-led {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    background: #FFA500; // Amber
+                    box-shadow: 0 0 8px rgba(#FFA500, 0.6);
+                    transition: all 0.3s ease;
+                }
+
+                .status-text {
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    transition: opacity 0.3s ease;
+                }
+
+                .status-hover {
+                    display: none;
+                }
+            }
+
+            .mission-id {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-family: $font-mono;
+                font-size: 0.65rem;
+                color: rgba($silver, 0.5);
+                font-weight: 400;
+                letter-spacing: 0.5px;
+
+                .barcode {
+                    font-family: $font-mono;
+                    font-size: 0.7rem;
+                    letter-spacing: -1px;
+                    opacity: 0.4;
+                    font-weight: 300;
+                }
+
+                .id-text {
+                    letter-spacing: 1px;
+                }
+            }
+        }
+
+        // Card Content Area
+        >a,
+        >h3,
+        >.title-divider,
+        >.tech-stack,
+        >.project-description {
+            padding-left: 20px;
+            padding-right: 20px;
+            position: relative;
+            z-index: 3;
+        }
+
+        >a {
+            padding-top: 20px;
+        }
+
         &__image {
             width: 100%;
             height: 200px;
             object-fit: cover;
-            border-radius: $radius;
-            margin-bottom: 20px;
+            border-radius: 0;
+            margin-bottom: 0;
             transition: all 0.4s ease;
 
-            // Desaturate and apply cyan tint (holographic look)
+            // Holographic look: Desaturate and apply cyan tint
             filter: grayscale(70%) sepia(30%) hue-rotate(150deg) brightness(0.9);
         }
 
-        h3 {
-            font-size: 1.5rem;
+        .project-title {
+            font-size: 1.1rem;
+            margin-top: 20px;
             margin-bottom: 10px;
+            font-family: $font-mono;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            line-height: 1.4;
+
+            a {
+                color: $white;
+                text-decoration: none;
+
+                &:hover {
+                    color: $cyan;
+                }
+            }
         }
 
-        .tags {
-            margin-top: auto;
-            padding-top: 20px;
+        .title-divider {
+            height: 1px;
+            background: linear-gradient(to right, $cyan, transparent);
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 15px;
+
+            .tech-item {
+                font-family: $font-mono;
+                font-size: 0.75rem;
+                color: $cyan;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                opacity: 0.9;
+            }
+        }
+
+        .project-description {
+            color: $silver;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex-grow: 1;
         }
     }
 }
+
 
 .experience-list {
     max-width: 800px;

@@ -5,18 +5,41 @@
         <div class="projects-grid">
             {% for project in site.data.featured_projects %}
             <div class="project-card">
+                <!-- Mission Header Bar -->
+                <div class="mission-header">
+                    <div class="status-indicator">
+                        <span class="status-led"></span>
+                        <span class="status-text status-default">[ STANDBY ]</span>
+                        <span class="status-text status-hover">[ ACCESSING ]</span>
+                    </div>
+                    <div class="mission-id">
+                        <span class="barcode">||||</span>
+                        <span class="id-text">[ EXP-25.{{ forloop.index | prepend: '0' | slice: -2, 2 }} ]</span>
+                    </div>
+                </div>
+
+                <!-- Holographic Image -->
                 <a href="{{ project.url | relative_url }}">
                     <img src="{{ project.image | relative_url }}" alt="{{ project.title }}" class="project-card__image">
                 </a>
-                <h3>
-                    <a href="{{ project.url | relative_url }}">{{ project.title }}</a>
+
+                <!-- Project Title -->
+                <h3 class="project-title">
+                    <a href="{{ project.url | relative_url }}">// {{ project.title | upcase }}</a>
                 </h3>
-                <p>{{ project.description }}</p>
-                <div class="tags">
+
+                <!-- Divider -->
+                <div class="title-divider"></div>
+
+                <!-- Tech Stack (Text-only with //) -->
+                <div class="tech-stack">
                     {% for tag in project.tags %}
-                    <span class="tech-tag">{{ tag }}</span>
+                    <span class="tech-item">// {{ tag | upcase }}</span>
                     {% endfor %}
                 </div>
+
+                <!-- Description -->
+                <p class="project-description">{{ project.description }}</p>
             </div>
             {% endfor %}
         </div>
