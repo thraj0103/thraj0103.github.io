@@ -12,6 +12,9 @@
                         <span class="status-text status-default">[ STANDBY ]</span>
                         <span class="status-text status-hover">[ ACCESSING ]</span>
                     </div>
+                    <div class="mission-timeline">
+                        <span class="timeline-text">{{ project.timeline }}</span>
+                    </div>
                     <div class="mission-id">
                         <span class="barcode">||||</span>
                         <span class="id-text">[ EXP-25.{{ forloop.index | prepend: '0' | slice: -2, 2 }} ]</span>
