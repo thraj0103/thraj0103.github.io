@@ -2,40 +2,46 @@
   url: /projects/human-following.html
   image: /img/featured/human-following/thumb.jpg
   description: Teaching a TurtleBot3 to detect, track, and follow humans in dynamic environments using ROS 2.
-  timeline: 2023
+  year: 23
+  project_number: "01"
   tags: [Perception, Control, Sensor Fusion, ROS 2]
 
 - title: Beacon-Based Localization for Multi-Sensor Fusion SLAM
   url: /projects/beacon-slam.html
   image: /img/featured/beacon-slam/thumb.jpg
   description: Added beacon-based global pose correction to an RTAB-Map SLAM stack in ROS 2; fused odometry and beacon ranges with a particle filter to reduce drift in GNSS-denied, feature-sparse spaces.
-  timeline: Fall 2024
+  year: 24
+  project_number: "01"
   tags: [Localization, SLAM, Sensor Fusion, ROS 2]
 
 - title: Dynamic Obstacle Avoidance with D* Lite (ROS 2 Nav2)
   url: /projects/dstar-lite.html
   image: /img/featured/dstar-lite/thumb.jpg
   description: Built a custom Nav2 planner plugin implementing D* Lite for real-time replanning. Integrated a dynamic costmap, an efficient cell-based priority queue, and smoothing for safe paths around sudden, occluded, and close-range obstacles.
-  timeline: Spring 2025
+  year: 25
+  project_number: "01"
   tags: [Path Planning, Navigation2, ROS 2, Gazebo]
 
 - title: Deep Reinforcement Learning for Autonomous Racing (F1TENTH)
   url: /projects/f1tenth.html
   image: /img/featured/f1tenth/thumb.jpg
   description: Trained PPO and SAC agents in simulation to perform high-speed racing on the F1TENTH platform. Designed reward shaping, curriculum training, and domain randomization to transfer policies from sim to track.
-  timeline: Spring 2025
+  year: 25
+  project_number: "02"
   tags: [Reinforcement Learning, Autonomous Racing, ROS 2, Gazebo]
 
 - title: Medical Endoscopy Simulation with Hardware-in-the-Loop RL
   url: /projects/endoscopy.html
   image: /img/featured/endoscopy/thumb.jpg
   description: Developed a simulation-based pipeline for robotic endoscopy, combining fiber-scanning models with reinforcement learning and hardware-in-the-loop experiments to optimize scanning patterns.
-  timeline: Nov 2024 - Present
+  year: 24
+  project_number: "02"
   tags: [Medical Robotics, Reinforcement Learning, Simulation, Control]
 
 - title: Adversarial Robustness in Vision-Based Robot Navigation
   url: /projects/adversarial-vision.html
   image: /img/featured/adversarial-vision/thumb.jpg
   description: Measured how black-box perturbations suppress YOLOv8 detections on nuScenes and evaluated real-time, no-retrain defenses (Gaussian blur, JPEG, bit-reduction, random-resize) suitable for embedded robots.
-  timeline: Summer 2025
+  year: 25
+  project_number: "03"
   tags: [Perception, Adversarial ML, Robustness, YOLOv8, PyTorch]
