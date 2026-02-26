@@ -1,0 +1,194 @@
+---
+layout: project
+title: Interactive Kinematics Simulator for UR5 Manipulator
+project_id: EXP-25.07
+permalink: /projects/ur5-kinematics.html
+
+role: Course Project
+timeline: Fall 2025
+platform: UR5 Manipulator, Python
+status: Completed
+
+tech_stack:
+- Python
+- NumPy
+- Matplotlib
+- Denavit-Hartenberg
+- Newton-Raphson
+- Damped Least Squares
+
+github_url: https://github.com/thraj0103/ur5-interactive-kinematics
+
+hero_video: /img/featured/ur5-kinematics/ur5_sim_2x.mp4
+---
+
+## MISSION_OBJECTIVE
+
+<div class="content-block">
+    <p><strong>TARGET:</strong> Implement a complete 6-DOF kinematic simulator for the Universal Robots UR5 from first
+        principles — using only NumPy and Matplotlib — featuring analytical forward kinematics via DH parameters,
+        an iterative Newton-Raphson IK solver with singularity-robust damped least squares, and trajectory
+        generation for square and helical paths.</p>
+
+    <p><strong>CONSTRAINT:</strong> No specialized robotics libraries (ROS, PyBullet, etc.). All kinematic
+        algorithms derived from scratch, demonstrating direct understanding of the underlying math. Solver must
+        achieve sub-millimeter accuracy with real-time performance (&lt;10ms per IK solution).</p>
+</div>
+
+---
+
+## SYSTEM_ARCHITECTURE
+
+### [ UR5 DH PARAMETERS ]
+
+<p>The UR5 is a 6-DOF collaborative manipulator (850mm reach, ±0.03mm repeatability, all revolute joints ±2π).
+    Kinematic structure defined by the following standard DH parameters:</p>
+
+<div class="content-block">
+    <table
+        style="width:100%; font-family: var(--font-mono); font-size:0.85rem; border-collapse: collapse; color: #ccd;">
+        <thead>
+            <tr style="border-bottom: 1px solid rgba(0,230,230,0.4); color: #0ee;">
+                <th style="padding: 8px 16px; text-align:left;">Joint</th>
+                <th style="padding: 8px 16px; text-align:right;">a (m)</th>
+                <th style="padding: 8px 16px; text-align:right;">d (m)</th>
+                <th style="padding: 8px 16px; text-align:right;">α (rad)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding:6px 16px;">1</td>
+                <td style="text-align:right;padding:6px 16px;">0</td>
+                <td style="text-align:right;padding:6px 16px;">0.089159</td>
+                <td style="text-align:right;padding:6px 16px;">π/2</td>
+            </tr>
+            <tr>
+                <td style="padding:6px 16px;">2</td>
+                <td style="text-align:right;padding:6px 16px;">−0.425</td>
+                <td style="text-align:right;padding:6px 16px;">0</td>
+                <td style="text-align:right;padding:6px 16px;">0</td>
+            </tr>
+            <tr>
+                <td style="padding:6px 16px;">3</td>
+                <td style="text-align:right;padding:6px 16px;">−0.39225</td>
+                <td style="text-align:right;padding:6px 16px;">0</td>
+                <td style="text-align:right;padding:6px 16px;">0</td>
+            </tr>
+            <tr>
+                <td style="padding:6px 16px;">4</td>
+                <td style="text-align:right;padding:6px 16px;">0</td>
+                <td style="text-align:right;padding:6px 16px;">0.10985</td>
+                <td style="text-align:right;padding:6px 16px;">π/2</td>
+            </tr>
+            <tr>
+                <td style="padding:6px 16px;">5</td>
+                <td style="text-align:right;padding:6px 16px;">0</td>
+                <td style="text-align:right;padding:6px 16px;">0.09465</td>
+                <td style="text-align:right;padding:6px 16px;">−π/2</td>
+            </tr>
+            <tr>
+                <td style="padding:6px 16px;">6</td>
+                <td style="text-align:right;padding:6px 16px;">0</td>
+                <td style="text-align:right;padding:6px 16px;">0.0823</td>
+                <td style="text-align:right;padding:6px 16px;">0</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+---
+
+## EXECUTION_LOG
+
+### 1. Forward Kinematics — DH Transformation Chain
+
+<p>Each joint contributes a homogeneous transformation using the standard DH convention, chained to give the
+    full base-to-end-effector transform:</p>
+
+<div class="math-block">
+    $$T_i = \begin{bmatrix} \cos\theta_i & -\sin\theta_i\cos\alpha_i & \sin\theta_i\sin\alpha_i & a_i\cos\theta_i \\
+    \sin\theta_i & \cos\theta_i\cos\alpha_i & -\cos\theta_i\sin\alpha_i & a_i\sin\theta_i \\ 0 & \sin\alpha_i &
+    \cos\alpha_i & d_i \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+    $$T_{base}^{ee} = T_1 \cdot T_2 \cdot T_3 \cdot T_4 \cdot T_5 \cdot T_6$$
+</div>
+
+### 2. Inverse Kinematics — Newton-Raphson with Damped Least Squares
+
+<p>The IK solver uses iterative Newton-Raphson with damped least squares regularization ($\lambda = 0.01$) to
+    avoid numerical blow-up near singular configurations where $J$ loses rank:</p>
+
+<div class="math-block">
+    $$J_{DLS} = J^T (J J^T + \lambda^2 I)^{-1}$$
+    $$\Delta q = J_{DLS} \cdot \Delta x$$
+</div>
+
+<div class="code-window">
+    <div class="code-window__header">
+        <span class="code-window__title">ur5_ik_solver.py</span>
+        <span class="code-window__status">● ACTIVE</span>
+    </div>
+    <pre class="code-window__content"><code>def inverse_kinematics_dls(target_pose, q_init, lam=0.01, max_iter=100, tol=1e-4):
+    q = q_init.copy()
+    for i in range(max_iter):
+        T_current = forward_kinematics_dh(q)
+        error = compute_pose_error(T_current, target_pose)  # 6D: pos + axis-angle
+
+        if np.linalg.norm(error) < tol:
+            return q, True, i  # converged
+
+        J = compute_jacobian_numerical(q)
+        J_dls = J.T @ np.linalg.inv(J @ J.T + lam**2 * np.eye(6))
+        q += J_dls @ error
+
+    return q, False, max_iter  # did not converge</code></pre>
+</div>
+
+### 3. Singularity Metrics
+
+<p>Two metrics quantify proximity to singular configurations throughout the workspace:</p>
+
+<ul class="feature-list">
+    <li><strong>Manipulability Index:</strong> $\mu = \sqrt{\det(JJ^T)}$ — approaches zero at singularities where the
+        robot cannot produce end-effector velocity in all directions.</li>
+    <li><strong>Condition Number:</strong> $\kappa = \sigma_{max} / \sigma_{min}$ — ratio of largest to smallest
+        Jacobian singular values. Large $\kappa$ indicates ill-conditioning where small pose errors produce large joint
+        angle errors.</li>
+</ul>
+
+---
+
+## RESULTS
+
+
+
+<ul class="feature-list">
+    <li><strong>IK Success Rate:</strong> 95.85% across full workspace (4.15% failures at reach boundaries or
+        uncorrectable near-singular configurations).</li>
+    <li><strong>Position Accuracy:</strong> Average 0.058mm, max 0.100mm — well within UR5's mechanical repeatability of
+        ±0.03mm.</li>
+    <li><strong>Orientation Accuracy:</strong> Average 0.0006°, max 0.0042°.</li>
+    <li><strong>Convergence:</strong> 5.8 ± 8.1 iterations on average; average solve time <strong>2.79ms</strong> →
+        enables &gt;300Hz control rate.</li>
+    <li><strong>Singularity Robustness:</strong> Min manipulability reached 0.001 (near-singular). Max condition number
+        128.15 — DLS damping ($\lambda=0.01$) maintained numerical stability throughout.</li>
+</ul>
+
+---
+
+## ANOMALY_REPORT
+
+<div class="alert-box alert-danger">
+    <h4>CHALLENGE: Numerical Jacobian vs Analytical Trade-off</h4>
+
+    <p><strong>ISSUE:</strong> Computing the Jacobian via finite differences (numerical differentiation) adds a
+        small overhead — one forward kinematics call per joint per iteration — compared to an analytical
+        Jacobian. This adds $O(n)$ FK evaluations per Newton-Raphson step.</p>
+
+    <p><strong>RATIONALE:</strong> Numerical differentiation was chosen deliberately for implementation simplicity
+        and generality. The per-step overhead remains negligible given the fast FK evaluation, keeping average
+        solve time under 3ms.</p>
+
+    <p><strong>FUTURE:</strong> An analytical Jacobian exploiting the UR5's specific geometric structure (all
+        revolute joints, wrist-partitioned geometry) could reduce solve time to sub-millisecond for velocity-level
+        real-time control.</p>
+</div>

@@ -1,90 +1,178 @@
 ---
-layout: default
+layout: project
 title: Adversarial Robustness in Vision-Based Robot Navigation
+project_id: EXP-25.03
 permalink: /projects/adversarial-vision.html
+
+role: Course Project
+timeline: Spring 2025
+platform: PyTorch, nuScenes Dataset
+status: Completed
+
+tech_stack:
+- Python
+- PyTorch
+- YOLOv8
+- OpenCV
+- NumPy
+- Matplotlib
+
+github_url: https://github.com/thraj0103/adversarial-robustness-robot-nav
+
+hero_image: /img/featured/adversarial-vision/hero.png
 ---
 
-<div class="project-nav">
-  <a href="{{ " /" | relative_url }}#projects" class="back-link">← Back to Projects</a>
+## MISSION_OBJECTIVE
+
+<div class="content-block">
+  <p><strong>TARGET:</strong> Systematically evaluate how small, imperceptible $L_\infty$-bounded perturbations can
+    suppress safety-critical object detections (pedestrians, vehicles, cyclists) in a YOLOv8-based robot navigation
+    pipeline, then identify practical defenses deployable on embedded hardware without retraining.</p>
+
+  <p><strong>CONSTRAINT:</strong> Defenses must require no model retraining, impose less than 10ms of latency
+    overhead (within a 30–50ms perception budget), and be implementable on resource-constrained embedded
+    systems without specialized hardware.</p>
 </div>
 
+---
 
+## SYSTEM_ARCHITECTURE
 
-<div class="container project-detail-container">
-  <div class="project-detail">
+### [ ATTACK FRAMEWORK ]
 
-    <!-- Project Header -->
-    <h1>Adversarial Robustness in Vision-Based Robot Navigation</h1>
+<ul class="feature-list">
+  <li><strong>Model:</strong> YOLOv8 (Ultralytics) — single-stage object detector evaluated on nuScenes mini dataset
+    (400 front-camera urban driving frames).</li>
+  <li><strong>Attack Type:</strong> Black-box random perturbation — no access to model gradients or architecture.
+    Iterative random search within $L_\infty$ ball.</li>
+  <li><strong>Target Classes:</strong> Person, Car, Bicycle, Truck — safety-critical navigation objects.</li>
+  <li><strong>Threat Model:</strong> $L_\infty$-bounded noise with $\varepsilon \in \{0.01, 0.04, 0.07, 0.10\}$, scaled
+    to $[0, 1]$ pixel range.</li>
+</ul>
 
-    <!-- Two-column Layout -->
-    <div class="project-layout">
+### [ DEFENSE MECHANISMS ]
 
-      <!-- Left Column: Text -->
-      <div class="project-content">
-        <p>
-          I evaluated how small, black-box perturbations can suppress object detections critical to robot navigation,
-          and tested practical defenses that run in real time without retraining the model. Using
-          <strong>YOLOv8</strong> on the
-          <strong>nuScenes</strong> dataset, the focus was on people, vehicles, and bicycles—classes that directly
-          impact safety.
-        </p>
+<ul class="feature-list">
+  <li><strong>Gaussian Blur:</strong> 3×3 kernel smoothing removes high-frequency adversarial noise while preserving
+    gross object features.</li>
+  <li><strong>JPEG Compression:</strong> Quality factor 75 — lossy encoding discards subtle perturbation details.</li>
+  <li><strong>Bit Reduction:</strong> Quantizes 8-bit pixel values to 5-bit representation, reducing the attack surface.
+  </li>
+  <li><strong>Random Resize + Pad:</strong> Scales to 90% then pads to original size, breaking spatial correlations of
+    adversarial patterns.</li>
+</ul>
 
-        <h3>What I Built</h3>
-        <ul>
-          <li><strong>Attack:</strong> A targeted random perturbation (L∞-bounded) that seeks to reduce critical
-            detections.</li>
-          <li><strong>Defenses (no retraining):</strong> Gaussian blur, JPEG compression, bit-depth reduction, random
-            resize+pad.</li>
-          <li><strong>Pipeline:</strong> PyTorch + Ultralytics YOLOv8 with OpenCV preprocessing, Jupyter notebooks for
-            analysis.</li>
-        </ul>
+---
 
-        <h3>Experiments</h3>
-        <ul>
-          <li><strong>Data:</strong> nuScenes mini (front camera frames from varied urban scenarios).</li>
-          <li><strong>Metrics:</strong> Critical object suppression rate, recovery rate under defense, and per-image
-            latency (ms).</li>
-          <li><strong>Setup:</strong> Real-time budget target &lt; 10&nbsp;ms per defense step on laptop-class hardware.
-          </li>
-        </ul>
+## EXECUTION_LOG
 
-        <h3>Key Results</h3>
-        <ul>
-          <li><strong>Suppression:</strong> Up to <strong>53.1%</strong> critical objects suppressed at
-            <code>ε = 0.1</code>; about <strong>25.3%</strong> at subtle <code>ε = 0.04</code>.
-          </li>
-          <li><strong>Defense:</strong> <strong>Gaussian blur</strong> restored <strong>62.9%</strong> of lost
-            detections with <strong>8.46&nbsp;ms</strong> overhead (within real-time budget).</li>
-          <li>Random resize and JPEG provided partial recovery; bit-reduction helped but less than blur.</li>
-        </ul>
+### 1. Targeted Random Perturbation Attack
 
-        <h3>Takeaways</h3>
-        <ul>
-          <li>Standard accuracy metrics hide worst-case failures; perception stacks need explicit robustness checks.
-          </li>
-          <li>Simple preprocessing can buy safety margin on embedded systems without touching the model weights.</li>
-        </ul>
+<p>The attack is a black-box iterative random search: sample random noise within the $L_\infty$ ball and keep
+  whichever sample reduces the number of detected critical objects the most.</p>
 
-        <h3>Stack</h3>
-        <div class="tech-stack">Python · PyTorch · Ultralytics YOLOv8 · OpenCV · NumPy/Pandas · Matplotlib · Jupyter
-        </div>
-      </div>
-
-      <!-- Right Column: Media -->
-      <div class="project-media">
-        <!-- Use a short clip or side-by-side frame -->
-        <video autoplay muted loop playsinline preload="auto" controls>
-          <source src="{{ site.baseurl }}/video/adversarial-vision-demo.mp4" type="video/mp4">
-          Sorry, your browser doesn’t support embedded videos.
-        </video>
-
-        <!-- If you don’t have a video yet, comment the <video> above and use an image like this:
-      <img src="{{ site.baseurl }}/img/featured/adversarial-vision/clean-vs-adv-vs-defended.jpg"
-           alt="Clean vs adversarial vs defended detections"
-           style="width:100%; height:auto; border-radius:8px;">
-      -->
-      </div>
-
-    </div>
+<div class="code-window">
+  <div class="code-window__header">
+    <span class="code-window__title">attack.py</span>
+    <span class="code-window__status">● ACTIVE</span>
   </div>
+  <pre class="code-window__content"><code>def targeted_attack(image, model, epsilon, num_tries=10):
+    original = image.copy()
+    best, min_det = original, count_critical(model(original))
+
+    for _ in range(num_tries):
+        # Random L-inf bounded perturbation
+        noise = np.random.uniform(-epsilon, epsilon, image.shape)
+        perturbed = np.clip(original + noise, 0, 1)
+
+        # Keep sample that suppresses the most detections
+        new_det = count_critical(model(perturbed))
+        if new_det < min_det:
+            min_det = new_det
+            best = perturbed
+
+    return best</code></pre>
+</div>
+
+### 2. Gaussian Blur Defense
+
+<div class="code-window">
+  <div class="code-window__header">
+    <span class="code-window__title">defense.py</span>
+    <span class="code-window__status">● ACTIVE</span>
+  </div>
+  <pre class="code-window__content"><code>def gaussian_blur_defense(image, kernel_size=3, sigma=1.0):
+    # Low-pass filter removes high-frequency adversarial content
+    return cv2.GaussianBlur(image, (kernel_size, kernel_size), sigma)
+    # Overhead: 8.46ms — fits within 30-50ms perception budget</code></pre>
+</div>
+
+---
+
+## RESULTS
+
+### Attack Effectiveness
+
+<p>Critical object suppression rate across $\varepsilon$ values — even barely perceptible noise ($\varepsilon=0.04$)
+  suppressed <strong>1 in 4</strong> critical detections, with average objects detected dropping from 6.5 → 3.4.</p>
+
+<div class="figure-row">
+  <div class="figure-cell">
+    <img src="/img/featured/adversarial-vision/attack_curves.png" alt="Attack Suppression Curves">
+    <figcaption>FIG_1.0: SUPPRESSION_RATE vs ε — detection drops to 50% at ε=0.1</figcaption>
+  </div>
+  <div class="figure-cell">
+    <img src="/img/featured/adversarial-vision/attack_visual.png" alt="Visual Attack Demo">
+    <figcaption>FIG_1.1: ATTACK_DEMO — detected objects (red boxes) decrease as ε increases 0.0→0.1</figcaption>
+  </div>
+</div>
+
+<ul class="feature-list">
+  <li><strong>ε = 0.01</strong> — 9.9% suppression &nbsp;(imperceptible to humans)</li>
+  <li><strong>ε = 0.04</strong> — 25.3% suppression (barely perceptible)</li>
+  <li><strong>ε = 0.07</strong> — 40.4% suppression (noticeable if examined closely)</li>
+  <li><strong>ε = 0.10</strong> — 53.1% suppression (clearly visible noise)</li>
+</ul>
+
+### Defense Performance
+
+<p>Evaluated against attacks at $\varepsilon = 0.03$. Gaussian blur is the only defense that both meets the 10ms
+  embedded latency budget <em>and</em> achieves the best recovery rate.</p>
+
+<div class="figure-row">
+  <div class="figure-cell">
+    <img src="/img/featured/adversarial-vision/defense_comparison.png" alt="Defense Comparison">
+    <figcaption>FIG_2.0: DEFENSE_PERFORMANCE — recovery rate and latency per method</figcaption>
+  </div>
+  <div class="figure-cell">
+    <img src="/img/featured/adversarial-vision/defense_visual.png" alt="Defense Visual Comparison">
+    <figcaption>FIG_2.1: DEFENSE_VISUAL — blur & resize restore detections vs. baseline</figcaption>
+  </div>
+</div>
+
+<ul class="feature-list">
+  <li><strong>Gaussian Blur:</strong> 62.9% recovery — 8.46ms overhead ✅ Embedded suitable</li>
+  <li><strong>Random Resize:</strong> 49.6% recovery — 7.56ms overhead ✅ Embedded suitable</li>
+  <li><strong>JPEG Compression:</strong> 45.4% recovery — 19.39ms overhead ❌ Too slow for embedded</li>
+  <li><strong>Bit Reduction:</strong> 27.4% recovery — 5.27ms overhead ✅ Embedded suitable</li>
+</ul>
+
+---
+
+## ANOMALY_REPORT
+
+<div class="alert-box alert-danger">
+  <h4>FINDING: Standard mAP Metrics Hide Safety-Critical Failures</h4>
+
+  <p><strong>ISSUE:</strong> YOLOv8 reports strong mAP scores on nuScenes benchmarks, giving a false sense of
+    reliability. However, at $\varepsilon = 0.04$ — perturbations barely perceptible to the human eye — the
+    system fails to detect <strong>1 in 4 safety-critical objects</strong> (pedestrians, cyclists, vehicles).</p>
+
+  <p><strong>IMPLICATION:</strong> In urban navigation contexts, a 25% miss rate on pedestrian and vehicle detections
+    can be catastrophic. Standard accuracy benchmarks do not capture worst-case adversarial behavior, which
+    is the relevant metric for safe deployment.</p>
+
+  <p><strong>KEY LESSON:</strong> Safe autonomous navigation demands explicit adversarial evaluation as part of the
+    development and certification process — not as an academic exercise, but as a fundamental safety requirement
+    analogous to crash testing in automotive design.</p>
 </div>

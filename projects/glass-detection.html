@@ -1,0 +1,177 @@
+---
+layout: project
+title: LiDAR-Based Glass Walls Detection
+project_id: EXP-25.04
+permalink: /projects/glass-detection.html
+
+role: Course Project
+timeline: Fall 2025
+platform: Ouster & Hesai LiDAR, Python
+status: Completed
+
+tech_stack:
+  - Python
+  - NumPy
+  - SciPy
+  - scikit-image
+  - Open3D
+  - Gaussian Smoothing
+  - Watershed Segmentation
+
+github_url: https://github.com/holmes1000/AFR-Final-Project
+hero_image: /img/featured/glass-detection/sample_output_1.png
+
+code_snippet_title: "lidar_glass_detection.ipynb — GlassDetector"
+code_snippet: |
+    # Verify peak is isolated using adaptive radial check in 16 directions
+    
+    def _verify_isolation(self, smoothed: np.ndarray, peak_r: int, peak_c: int) -> bool:
+        H, W = smoothed.shape
+        peak_intensity = smoothed[peak_r, peak_c]
+        
+        # Adaptive radius: higher peaks get larger search radius
+        radius = int(np.clip(peak_intensity * self.config.radius_scale,
+                             self.config.min_radius, self.config.max_radius))
+        
+        iso_thresh = np.percentile(smoothed[smoothed > 0], self.config.isolation_percentile)
+        directions_passed = 0
+        distances = []
+        
+        # Check radial intensity drop-off in 16 directions
+        for dr, dc in self.directions:
+            for step in range(1, radius + 1):
+                r, c = int(peak_r + dr * step), int(peak_c + dc * step)
+                if r < 0 or r >= H or c < 0 or c >= W:
+                    break
+                if smoothed[r, c] < iso_thresh:
+                    directions_passed += 1
+                    distances.append(step)
+                    break
+                    
+        # Verify enough directions passed and distances are consistent
+        if directions_passed >= self.config.min_directions:
+            cv = np.std(distances) / np.mean(distances) if np.mean(distances) > 0 else 1.0
+            return cv < self.config.distance_std_threshold
+            
+        return False
+---
+
+## MISSION_OBJECTIVE
+
+<div class="content-block">
+  <p><strong>TARGET:</strong> Develop a computationally efficient glass detection method using only multi-LiDAR
+    intensity patterns without relying on camera vision or complex deep learning.</p>
+
+  <p><strong>KEY IDEA:</strong> Glass surfaces can be detected by exploiting their unique LiDAR physical signature. Most
+    LiDAR pulses pass through or bounce off glass, yielding zero return. However, perpendicular hits or edges cause a
+    strong specular reflection. By identifying <strong>isolated bright intensity spots</strong> surrounded by darkness,
+    we can reliably locate glass walls.
+  </p>
+</div>
+
+---
+
+## SYSTEM_ARCHITECTURE
+
+### [ PIPELINE OVERVIEW ]
+A deterministic 6-step signal processing pipeline on 2D projected LiDAR data:
+
+<ul class="feature-list">
+  <li><strong>1. 2D Projection:</strong> LiDAR point cloud intensity returns are spherically projected onto a 2D image matrix.</li>
+  <li><strong>2. Gaussian Smoothing:</strong> Applying a Gaussian filter to reduce point cloud noise and continuous intensity variations.</li>
+  <li><strong>3. Peak Detection:</strong> Finding local maxima within a specific valid intensity range (e.g., 70-90 percentile) to ignore overly bright concrete walls while capturing glass specular highlights.</li>
+  <li><strong>4. Radial Isolation Verification:</strong> Casting rays in 16 directions (every 22.5°) radially from each peak to verify it is completely surrounded by darkness (low returns), confirming isolation.</li>
+  <li><strong>5. Watershed Segmentation:</strong> Treating the smoothed image as a topographic surface and flooding from validated peak locations to capture the physical extent of the glass pane.</li>
+  <li><strong>6. Spatial Filtering:</strong> Filtering watershed regions by volumetric size and rejecting peaks in the top/bottom 10% of the image (extreme scanning angles where perpendicular return is impossible).</li>
+</ul>
+
+---
+
+## EXECUTION_LOG
+
+### 1. Intensity Scaling and Thresholding
+
+<p>Naively finding the brightest pixels fails because normal concrete walls return much higher intensities than glass.
+  We extract peaks mathematically constrained between specific minimum (prominence) and maximum percentiles.
+</p>
+
+<div class="code-window">
+  <div class="code-window__header">
+    <span class="code-window__title">GlassDetector._find_peaks()</span>
+    <span class="code-window__status">● ACTIVE</span>
+  </div>
+  <pre class="code-window__content"><code>def _find_peaks(self, smoothed: np.ndarray):
+    min_thresh = np.percentile(smoothed[smoothed > 0], self.config.prominence_percentile)
+    max_thresh = np.percentile(smoothed[smoothed > 0], self.config.max_brightness_percentile)
+    
+    all_peaks = peak_local_max(smoothed, min_distance=self.config.min_distance,
+                               threshold_abs=min_thresh, exclude_border=True)
+                               
+    # Filter out peaks that are TOO bright (likely opaque walls)
+    filtered = [p for p in all_peaks if smoothed[p[0], p[1]] <= max_thresh]
+    return all_peaks, np.array(filtered)</code></pre>
+</div>
+
+### 2. Radial Isolation Verification
+
+<p>Once a local maximum is found, the <code>_verify_isolation</code> algorithm algorithmically "looks around".
+  It casts 16 vectors outward up to an adaptive radius proportional to the peak's inherent brightness. It then measures
+  how many directions successfully drop below an isolation threshold. It also computes the coefficient of variation
+  <code>cv = std(distances) / mean(distances)</code> to ensure the drop-off is roughly circular, avoiding linear features
+  like poles or wires.
+</p>
+
+### 3. Watershed Segmentation & Masking
+
+<p>Isolated peaks are single points, but the robot needs to avoid the whole glass pane. We use the
+  <code>watershed</code> algorithm to "flood" out from the validated peaks down the intensity topography,
+  mapping the full contiguous area of the specular reflection.
+</p>
+
+<div class="code-window">
+  <div class="code-window__header">
+    <span class="code-window__title">GlassDetector._segment_peaks()</span>
+    <span class="code-window__status">● ACTIVE</span>
+  </div>
+  <pre class="code-window__content"><code>def _segment_peaks(self, smoothed: np.ndarray, peaks: np.ndarray) -> np.ndarray:
+    markers = np.zeros_like(smoothed, dtype=int)
+    for i, (r, c) in enumerate(peaks):
+        markers[r, c] = i + 1
+        
+    # Invert topography to flood down from peaks
+    return watershed(-smoothed, markers, mask=smoothed > 0)</code></pre>
+</div>
+
+---
+
+## RESULTS_ANALYSIS
+
+<div class="figure-cell" style="margin: 40px 0;">
+  <img src="/img/featured/glass-detection/sample_output_1.png"
+    alt="Ouster LiDAR Glass Detection Sample 1 (Frame 1689414997)"
+    style="max-width: 100%; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,255,255,0.1); border: 1px solid rgba(0,255,255,0.3);">
+  <figcaption>FIG_1.0: Detection + GT vs RGB Image. The deterministic pipeline successfully isolates Gaussian
+    peaks corresponding to glass walls.</figcaption>
+</div>
+
+<div class="figure-cell" style="margin: 40px 0;">
+  <img src="/img/featured/glass-detection/sample_output_2.png"
+    alt="Ouster LiDAR Glass Detection Sample 2 (Frame 1689414988)"
+    style="max-width: 100%; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,255,255,0.1); border: 1px solid rgba(0,255,255,0.3);">
+  <figcaption>FIG_1.1: Frame 2 evaluation. The rigid isolation check significantly minimizes False Positives
+    (red) while maintaining high True Positives (yellow).</figcaption>
+</div>
+
+<div class="figure-cell" style="margin: 40px 0;">
+  <img src="/img/featured/glass-detection/sample_output_3.png"
+    alt="Ouster LiDAR Glass Detection Sample 3"
+    style="max-width: 100%; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,255,255,0.1); border: 1px solid rgba(0,255,255,0.3);">
+  <figcaption>FIG_1.2: Frame 3 evaluation. Consistent detection of perpendicular returns filtered by adaptive isolation.</figcaption>
+</div>
+
+<ul class="feature-list">
+  <li><strong>Computational Efficiency:</strong> Runs exceptionally fast compared to 3D deep learning approaches as operations are mapped to a 2D pseudo-image projection matrix.</li>
+  <li><strong>No Training Required:</strong> Completely deterministic mathematical model highly generalizable to different environments without fine-tuning weights.</li>
+  <li><strong>Handling Multiview:</strong> Automatically aligned multiple sensors (Hesai and Ouster sweeps) using pose files to form a dense coherent point cloud map.</li>
+  <li><strong>Robustness:</strong> Achieves low False Positive rates via strict multi-condition filtering: maximum brightness constraints, 16-direction radial drop-off minimums, isolation circularity, and spatial bound rejection.</li>
+</ul>

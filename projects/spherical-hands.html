@@ -1,0 +1,160 @@
+---
+layout: project
+title: Kinematic Analysis & Simulation of Underactuated Spherical Hands
+project_id: EXP-25.06
+permalink: /projects/spherical-hands.html
+
+role: Course Project
+timeline: Fall 2025
+platform: SolidWorks, Screw Theory
+status: Completed
+
+tech_stack:
+- SolidWorks
+- Motion Study
+- Screw Theory
+- Product of Exponentials
+- Grübler Analysis
+
+hero_video: /img/featured/spherical-hands/hero.mp4
+---
+
+## MISSION_OBJECTIVE
+
+<div class="content-block">
+  <p><strong>TARGET:</strong> Reproduce and analyze the Spherical Hands underactuated grasping mechanism from
+    Ma et al. (2016) — a robotic hand where all joint axes intersect at a single remote center point, enabling
+    <em>size-invariant grasping</em> without active control of individual finger forces.
+  </p>
+
+  <p><strong>APPROACH:</strong> Full SolidWorks CAD model with 45-degree angular offsets and 0.72 radian base tilt,
+    Grübler mobility analysis, forward kinematics via Screw Theory and Product of Exponentials, and dynamic
+    Motion Study simulation with passive spring compliance to validate adaptive underactuated grasping.</p>
+</div>
+
+---
+
+## SYSTEM_ARCHITECTURE
+
+### [ MECHANISM DESIGN ]
+
+<ul class="feature-list">
+  <li><strong>Fingers:</strong> Two curved fingers + one straight thumb. Each curved finger has two revolute joints with
+    axes intentionally offset at 45° so both intersect at remote center point $N$ above the palm.</li>
+  <li><strong>Underactuation:</strong> 3 active proximal joints (motors) drive 6 joints total via passive distal joints
+    with torsional springs — 2:1 underactuation ratio.</li>
+  <li><strong>Thumb:</strong> Conventional planar geometry with a passive pivot base adding one extra passive DOF for
+    lateral grasp adaptability without active control.</li>
+  <li><strong>Spring Compliance:</strong> Distal joints have $k = 20\;\text{N·mm/deg} \approx 1.15\;\text{N·m/rad}$,
+    damping $c = 0.001\;\text{N·mm/(deg/s)}$.</li>
+</ul>
+
+### [ MOBILITY ANALYSIS (GRÜBLER) ]
+
+<div class="content-block">
+  <p>Two configurations were analyzed using the spatial Grübler formula $M = 6(n-1-j) + \sum f_i$:</p>
+</div>
+
+<ul class="feature-list">
+  <li><strong>Open Hand:</strong> $M = 6$ — full spatial mobility for finger positioning.</li>
+  <li><strong>Grasped Object:</strong> $M = 3$ — constrained by object contact, enabling stable in-hand manipulation.
+  </li>
+</ul>
+
+---
+
+## EXECUTION_LOG
+
+### 1. Forward Kinematics — Screw Theory & Product of Exponentials
+
+<p>Each curved finger's proximal and distal joints are modeled as screw axes passing through the remote center point
+  $N$. The screw axis for joint $i$ with unit direction $\omega_i$ is:</p>
+
+<div class="math-block">
+  $$\mathcal{S}_i = \begin{bmatrix} \omega_i \\ -\omega_i \times r_N \end{bmatrix}$$
+</div>
+
+<p>The 45-degree angular offsets ensure both axes satisfy the intersection condition
+  $\omega \cdot (N - q) = 0$. The full fingertip transform uses the Product of Exponentials:</p>
+
+<div class="math-block">
+  $$T(\theta_1, \theta_2) = e^{[\mathcal{S}_1]\theta_1}\,e^{[\mathcal{S}_2]\theta_2}\,M$$
+</div>
+
+<p>where matrix exponentials follow Rodrigues' formula:</p>
+
+<div class="math-block">
+  $$e^{[\omega]\theta} = I + \sin\theta\,[\omega] + (1-\cos\theta)\,[\omega]^2$$
+</div>
+
+### 2. Motion Study — Sinusoidal Motor Trajectories
+
+<p>Three proximal motors follow sinusoidal trajectories with 120° phase offsets, producing a sequential
+  wave-like closing pattern that distributes contact timing across the three fingers:</p>
+
+<div class="code-window">
+  <div class="code-window__header">
+    <span class="code-window__title">motion_profile.m</span>
+    <span class="code-window__status">● ACTIVE</span>
+  </div>
+  <pre class="code-window__content"><code>% Sinusoidal motor trajectories with 120-deg phase spacing
+f  = 0.5;   % Hz
+A  = 20;    % deg amplitude
+t0 = 40;    % deg initial angle
+
+theta_F1(t)    = t0 + A * sin(2*pi*f*t +   0);   % phi_1 = 0
+theta_F2(t)    = t0 + A * sin(2*pi*f*t + 120);   % phi_2 = 120 deg
+theta_thumb(t) = t0 + A * sin(2*pi*f*t + 240);   % phi_3 = 240 deg
+
+% Distal spring dynamics (passive compliance)
+tau_spring = -k*(theta - theta0) - c*(d_theta/dt);
+% k = 1.15 N.m/rad, c = 0.001 N.mm/(deg/s)</code></pre>
+</div>
+
+---
+
+## RESULTS
+
+<div class="figure-row">
+  <div class="figure-cell">
+    <img src="/img/featured/spherical-hands/cad_model.png" alt="SolidWorks CAD Model">
+    <figcaption>FIG_1.0: CAD_MODEL — Spherical Hands assembly with joint axis visualization</figcaption>
+  </div>
+  <div class="figure-cell">
+    <img src="/img/featured/spherical-hands/grasp_demo.png" alt="Triangular Prism Grasp">
+    <figcaption>FIG_1.1: GRASP_DEMO — Stable three-point contact on 25mm triangular prism</figcaption>
+  </div>
+</div>
+
+<div class="content-block">
+  <p>The Motion Study simulation successfully demonstrated stable grasping of an equilateral triangular prism
+    (inscribing radius $r = 25\;\text{mm}$, depth $d = 10\;\text{mm}$). The passive distal springs automatically
+    adapted to the object geometry, with spring deflections varying per-finger based on contact location and force
+    distribution. The 120° phase spacing produced sequential finger engagement, allowing progressive spring
+    adaptation before full three-point contact was established.</p>
+
+  <p>This confirms the geometric design principle: all joint axes intersecting at $N$ creates a spherical workspace
+    constraint that decouples finger motion from object geometry — the mechanism grasps stably regardless of where
+    along the spherical surface contact occurs.</p>
+</div>
+
+---
+
+## ANOMALY_REPORT
+
+<div class="alert-box alert-danger">
+  <h4>CHALLENGE: 45-Degree Offset Geometry Complexity</h4>
+
+  <p><strong>ISSUE:</strong> The 45-degree angular offsets required for joint axis intersection at the remote center
+    point $N$ create complex non-planar spatial geometry. Maintaining precise angular relationships throughout the
+    SolidWorks assembly — especially at mating surfaces between proximal links and curved finger geometry — required
+    careful constraint management to avoid over-constrained or degenerate configurations.</p>
+
+  <p><strong>KEY TRADE-OFF:</strong> The spring constant $k = 1.15\;\text{N·m/rad}$ balances grasp force capability
+    against passive adaptation compliance. Too stiff and the distal joints cannot adapt to object geometry; too
+    compliant and grasp stability is lost under load.</p>
+
+  <p><strong>VALIDATION GAP:</strong> The Ma et al. reference work validated size-invariant grasping across
+    38–58 mm object sizes. This implementation demonstrated grasping for a single 25 mm test object. Testing
+    across a range of object sizes remains as future work to fully verify the size-invariance property.</p>
+</div>

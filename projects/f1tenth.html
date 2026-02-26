@@ -1,53 +1,173 @@
 ---
-layout: default
-title: Deep Reinforcement Learning for Autonomous Racing (F1TENTH)
+layout: project
+title: Deep Reinforcement Learning for Autonomous Racing
+project_id: EXP-25.02
 permalink: /projects/f1tenth.html
+
+role: Course Project
+timeline: Spring 2025
+platform: F1TENTH Simulator, Python
+status: Completed
+
+tech_stack:
+- Python
+- PyTorch
+- Reinforcement Learning
+- Stable-Baselines3
+- DDPG
+- PPO
+- F1TENTH Gym
+
+github_url: https://github.com/thraj0103/f1tenth-drl-racing
+
+hero_video: /img/featured/f1tenth/hero_2x.mp4
 ---
 
-<div class="project-nav">
-  <a href="{{ " /" | relative_url }}#projects" class="back-link">← Back to Projects</a>
+## MISSION_OBJECTIVE
+
+<div class="content-block">
+    <p><strong>TARGET:</strong> Train autonomous racing agents on the F1TENTH simulator (Austin F1 track) using
+        Deep Reinforcement Learning. Compare two algorithms — <strong>DDPG</strong> (off-policy, actor-critic) and
+        <strong>PPO</strong> (on-policy, clipped surrogate) — to evaluate stability, convergence, and top-speed
+        performance.
+    </p>
+
+    <p><strong>CONSTRAINT:</strong> Agents operate from raw LiDAR observations only (no camera, no map). The
+        observation must be processed in real-time and actions must remain within physical actuator limits via
+        a $\tanh$-constrained output layer.</p>
 </div>
 
+---
 
+## SYSTEM_ARCHITECTURE
 
-<div class="container project-detail-container">
-  <div class="project-detail">
-    <h1>Deep Reinforcement Learning for Autonomous Racing (F1TENTH)</h1>
+### [ OBSERVATION SPACE ]
 
-    <div class="project-layout">
-      <div class="project-content">
-        <p>
-          I applied <strong>deep reinforcement learning</strong> to train autonomous racing agents on the
-          <strong>F1TENTH platform</strong>. The objective was to push high-speed performance while keeping stable
-          control.
-          Agents were trained in simulation and validated on physical hardware.
-        </p>
+<ul class="feature-list">
+    <li><strong>LiDAR:</strong> 270° FOV, 1080 raw beams → downsampled every 4th reading → <strong>68 distance
+            values</strong> (clipped at 30.0 m, NaN/Inf replaced with max).</li>
+    <li><strong>Kinematics:</strong> Vehicle position, orientation, and velocity concatenated to the LiDAR vector.</li>
+    <li><strong>Action Space:</strong> Continuous 2D — steering angle and throttle, bounded to $[-1, 1]$ via $\tanh$ and
+        scaled to physical limits.</li>
+</ul>
 
-        <h3>Methodology</h3>
-        <ul>
-          <li>Used <strong>Proximal Policy Optimization (PPO)</strong> and <strong>Soft Actor–Critic (SAC)</strong>
-            algorithms.</li>
-          <li>Designed <strong>reward shaping</strong> for speed, track adherence, and overtaking.</li>
-          <li>Implemented <strong>curriculum learning</strong> to gradually increase track complexity.</li>
-          <li>Applied <strong>domain randomization</strong> for robustness when transferring from sim to real.</li>
-        </ul>
+### [ REWARD FUNCTION ]
 
-        <h3>Results</h3>
-        <ul>
-          <li>Agents achieved competitive lap times in Gazebo simulations.</li>
-          <li>Successfully transferred to physical F1TENTH cars with minimal tuning.</li>
-          <li>Stable lane keeping and overtaking maneuvers under dynamic conditions.</li>
-        </ul>
+<div class="content-block">
+    <p>The reward function balances speed, track adherence, and safety across several components:</p>
+</div>
 
-        <h3>Stack</h3>
-        <div class="tech-stack">Python · PyTorch · Stable-Baselines3 · ROS 2 · Gazebo · F1TENTH</div>
-      </div>
+<div class="math-block">
+    $$R(s,a,s') = R_{speed} + R_{align} + R_{waypoint} + R_{progress} + R_{lap} - P_{wall} - P_{collision} -
+    P_{control}$$
+</div>
 
-      <div class="project-media">
-        <video autoplay muted loop playsinline controls>
-          <source src="{{ site.baseurl }}/video/f1tenth-demo.mp4" type="video/mp4">
-        </video>
-      </div>
+<ul class="feature-list">
+    <li><strong>Speed:</strong> $R_{speed} = v + \mathbf{1}[v>4]\cdot(v-4) + \mathbf{1}[v>6]\cdot(v-6)$ — tiered bonus
+        above 4 m/s and 6 m/s thresholds.</li>
+    <li><strong>Alignment:</strong> $R_{align} = 1.5 \cdot \hat{d}_{car} \cdot \hat{d}_{waypoint}$ — dot product between
+        car heading and next waypoint direction.</li>
+    <li><strong>Progress:</strong> $R_{progress} = 10 \cdot \frac{\text{waypoint index}}{\text{total waypoints}}$ —
+        continuous advancement reward.</li>
+    <li><strong>Lap Completion:</strong> $+100$ on lap finish, $+20$ on lap-time improvement, $+100$ if episode ends
+        without collision.</li>
+    <li><strong>Wall Penalty:</strong> $P_{wall} = 100 \cdot \frac{0.2 - \min(\text{scan})}{0.2}$ when closer than 0.2 m
+        to boundary.</li>
+    <li><strong>Collision Penalty:</strong> $P_{collision} = 200$ per collision event.</li>
+</ul>
+
+---
+
+## EXECUTION_LOG
+
+### 1. Waypoint-Based Progress Tracking
+
+<p>A key design component is the <code>ObservationProcessor</code> class that loads centerline waypoints from the
+    Austin F1 track CSV and maintains lap state:</p>
+
+<div class="code-window">
+    <div class="code-window__header">
+        <span class="code-window__title">observation_processor.py</span>
+        <span class="code-window__status">● ACTIVE</span>
     </div>
-  </div>
+    <pre class="code-window__content"><code>class ObservationProcessor:
+    def __init__(self, track_csv):
+        self.waypoints = load_centerline(track_csv)
+        self.visited = set()
+        self.lap_count = 0
+
+    def step(self, pose):
+        closest = get_closest_waypoint(pose, self.waypoints)
+        self.visited.add(closest)
+
+        # Lap complete: visited 90%+ of waypoints and near start
+        if len(self.visited) / len(self.waypoints) >= 0.90:
+            if near_start(pose):
+                self.lap_count += 1
+                self.visited.clear()
+
+        progress = closest / len(self.waypoints)
+        alignment = heading_dot_product(pose, self.waypoints[closest])
+        return progress, alignment</code></pre>
+</div>
+
+### 2. Algorithm Comparison: DDPG vs PPO
+
+<ul class="feature-list">
+    <li><strong>DDPG (Off-policy):</strong> Replay buffer size $10^6$, target network $\tau=0.005$, OU exploration
+        noise, max speed <strong>5 m/s</strong> (failed to learn at 7 m/s).</li>
+    <li><strong>PPO (On-policy):</strong> Clip ratio $\epsilon=0.2$, entropy coefficient 0.01, GAE $\lambda=0.95$, 10
+        epochs per update, max speed <strong>7 m/s</strong>.</li>
+</ul>
+
+---
+
+## RESULTS
+
+<p>Both agents were trained for 3,500 episodes. PPO significantly outperformed DDPG across all metrics.</p>
+
+<div class="figure-row">
+    <div class="figure-cell">
+        <img src="/img/featured/f1tenth/ddpg_curves.png" alt="DDPG Reward and Lap Curves">
+        <figcaption>FIG_1.0: DDPG — Reward and lap count over 3,500 episodes</figcaption>
+    </div>
+    <div class="figure-cell">
+        <img src="/img/featured/f1tenth/ppo_curves.png" alt="PPO Reward and Lap Curves">
+        <figcaption>FIG_1.1: PPO — Reward and lap count over 3,500 episodes</figcaption>
+    </div>
+</div>
+
+<ul class="feature-list">
+    <li><strong>DDPG:</strong> Highly unstable early training with a sharp reward drop around episode 2,000 (possible
+        catastrophic forgetting). Stabilized post-2,500 episodes, reaching ~120,000 total reward at 5 m/s.</li>
+    <li><strong>PPO:</strong> Strong, steady reward increase from episode 1,000. Peaked near <strong>250,000</strong>
+        reward — nearly double DDPG — while controlling a faster vehicle at 7 m/s. Consistent lap completion from
+        episode 2,000 onward.</li>
+</ul>
+
+<div class="figure-row">
+    <div class="figure-cell" style="max-width: 600px; margin: 0 auto;">
+        <img src="/img/featured/f1tenth/combined_curves.png" alt="DDPG vs PPO Combined Reward Comparison">
+        <figcaption>FIG_1.2: COMBINED — DDPG vs PPO reward curve comparison</figcaption>
+    </div>
+</div>
+
+---
+
+## ANOMALY_REPORT
+
+<div class="alert-box alert-danger">
+    <h4>CHALLENGE: DDPG Training Instability at High Speed</h4>
+
+    <p><strong>ISSUE:</strong> DDPG repeatedly failed to learn a viable policy when the maximum speed was set to 7 m/s.
+        The agent's reward showed erratic oscillations throughout training, with a catastrophic drop near episode 2,000
+        suggesting policy collapse or overfitting to early experience in the replay buffer.</p>
+
+    <p><strong>ROOT CAUSE:</strong> DDPG's reliance on a deterministic policy with OU noise for exploration is
+        poorly suited to high-speed dynamics where small control errors compound rapidly. The replay buffer
+        re-uses early bad experiences, causing gradient instability.</p>
+
+    <p><strong>FIX:</strong> Reduced DDPG max speed to 5 m/s to allow learning. PPO's clipped surrogate objective
+        ($\epsilon = 0.2$) inherently prevented large destabilizing policy updates, enabling it to operate stably
+        at 7 m/s.</p>
 </div>

@@ -1,0 +1,203 @@
+---
+layout: project
+title: Target-less Spatiotemporal LiDAR-Camera Calibration
+project_id: EXP-25.05
+permalink: /projects/lidar-camera-calibration.html
+
+role: Course Project
+timeline: Fall 2025
+platform: KITTI Dataset, Python
+status: Completed
+
+tech_stack:
+- Python
+- PyTorch
+- SalsaNext
+- DeepLabV3+
+- OpenCV
+- GTSAM
+- L-BFGS-B
+
+github_url: https://github.com/holmes1000/AFR-Final-Project
+
+code_snippet_title: "losses.py — SemanticAlignmentLoss"
+code_snippet: |
+  # Bi-directional Chamfer distance between 3D LIDAR array & 2D Image masks
+  
+  def compute_loss(self, projected_points, mask_pixels, weight_i2p=1.0):
+      loss_p2i = self.compute_p2i_loss(projected_points, mask_pixels)
+      loss_i2p = self.compute_i2p_loss(projected_points, mask_pixels)
+      
+      # Normalization factor from paper to balance both terms
+      norm = len(projected_points) / max(1, int(len(mask_pixels) * 0.02))
+      return loss_p2i + weight_i2p * norm * loss_i2p
+---
+
+## MISSION_OBJECTIVE
+
+<div class="content-block">
+  <p><strong>TARGET:</strong> Implement SST-Calib — a target-less, joint spatial-temporal calibration framework
+    that estimates the 6-DoF extrinsic transform between LiDAR and camera <em>and</em> the time delay
+    between sensor capture instants, simultaneously — without checkerboard targets, manual initialization,
+    or ground truth point labels.</p>
+
+  <p><strong>KEY IDEA:</strong> Cars are used as natural calibration features. SalsaNext segments car points
+    from 3D LiDAR scans; DeepLabV3 segments car pixels from camera images. The extrinsic parameters are
+    then found by minimizing a bi-directional Chamfer-like distance between the two independently-obtained
+    sets of car correspondences.</p>
+</div>
+
+---
+
+## SYSTEM_ARCHITECTURE
+
+### [ PIPELINE OVERVIEW ]
+
+<ul class="feature-list">
+  <li><strong>LiDAR Segmentation:</strong> SalsaNext (pretrained 3D CNN) classifies each point directly in 3D — no
+    camera calibration required for this step. Falls back to geometric filtering (height 2m–50m, above-ground clearance)
+    + mask projection for environments without the model.</li>
+  <li><strong>Image Segmentation:</strong> DeepLabV3+ segments <code>car</code> and <code>bus</code> classes from camera
+    frames, producing a binary mask of car pixels.</li>
+  <li><strong>Spatial Optimization:</strong> <code>MultiFrameOptimizer</code> — L-BFGS-B on axis-angle + translation (6
+    parameters), averaging loss across multiple frames for robustness.</li>
+  <li><strong>Temporal Calibration:</strong> <code>TemporalCalibrator</code> — estimates time delay δ by shifting LiDAR
+    points by <code>v·δ</code> and finding the δ that minimizes alignment loss.</li>
+</ul>
+
+---
+
+## EXECUTION_LOG
+
+### 1. Bi-directional Semantic Alignment Loss
+
+<p>The core loss uses two <code>scipy.spatial.cKDTree</code> nearest-neighbour queries to penalize misalignment
+  in both directions between projected LiDAR car points and image car pixels:</p>
+
+<div class="code-window">
+  <div class="code-window__header">
+    <span class="code-window__title">losses.py — SemanticAlignmentLoss</span>
+    <span class="code-window__status">● ACTIVE</span>
+  </div>
+  <pre class="code-window__content"><code>def compute_p2i_loss(self, projected_points, mask_pixels):
+    # For each projected LiDAR point → nearest car pixel
+    tree = cKDTree(mask_pixels)
+    distances, _ = tree.query(projected_points, k=1)
+    return np.mean(distances ** 2)
+
+def compute_i2p_loss(self, projected_points, mask_pixels):
+    # For sampled car pixels → nearest projected point (2% subsample)
+    n_sample = max(1, int(len(mask_pixels) * 0.02))
+    sampled = self.rng.choice(len(mask_pixels), size=n_sample, replace=False)
+    tree = cKDTree(projected_points)
+    distances, _ = tree.query(mask_pixels[sampled], k=1)
+    return np.mean(distances ** 2)
+
+def compute_loss(self, projected_points, mask_pixels, weight_i2p=1.0):
+    loss_p2i = self.compute_p2i_loss(projected_points, mask_pixels)
+    loss_i2p = self.compute_i2p_loss(projected_points, mask_pixels)
+    # Normalization factor from paper to balance both terms
+    norm = len(projected_points) / max(1, int(len(mask_pixels) * 0.02))
+    return loss_p2i + weight_i2p * norm * loss_i2p</code></pre>
+</div>
+
+### 2. Multi-Stage Spatial Optimizer
+
+<p>Rotation is parameterized as <strong>axis-angle</strong> (not Euler angles) to avoid gimbal lock. The
+  optimizer runs 3 stages with a decreasing I2P weight schedule to first pull points coarsely into the
+  mask, then fine-tune:</p>
+
+<div class="code-window">
+  <div class="code-window__header">
+    <span class="code-window__title">optimizer.py — MultiFrameOptimizer</span>
+    <span class="code-window__status">● ACTIVE</span>
+  </div>
+  <pre class="code-window__content"><code># Axis-angle avoids gimbal lock vs Euler representation
+rotvec = Rotation.from_matrix(R).as_rotvec()  # 3D vector: axis * angle
+params = [rx, ry, rz, tx, ty, tz]             # 6 DOF total
+
+# Bounds: ±15° rotation, ±0.2m translation from initial guess
+rot_bound  = 15 * np.pi / 180   # radians
+trans_bound = 0.20               # meters
+
+# 3-stage weight schedule (from original SST-Calib paper)
+weight_schedule = [
+    (20.0, 20),   # Stage 1: High I2P — coarse alignment
+    (1.0,  30),   # Stage 2: Balanced
+    (0.02, 20),   # Stage 3: Low I2P — fine-tune P2I precision
+]
+
+# Each stage runs L-BFGS-B, warm-starting from the previous stage result
+result = minimize(obj_func, params, method='L-BFGS-B',
+                  bounds=bounds, options={'ftol': 1e-6})</code></pre>
+</div>
+
+### 3. Temporal Calibration — Visual Odometry + Grid Search
+
+<p>If there's a time delay δ between sensors, LiDAR points are spatially shifted by
+  <code>t_compensated = t_base + v·δ</code>. The system estimates velocity via
+  FAST feature detection → Lucas-Kanade optical flow → Essential matrix recovery, then
+  searches for the optimal δ:
+</p>
+
+<div class="code-window">
+  <div class="code-window__header">
+    <span class="code-window__title">temporal_calibration.py — TemporalCalibrator</span>
+    <span class="code-window__status">● ACTIVE</span>
+  </div>
+  <pre class="code-window__content"><code># Velocity from visual odometry (FAST + Lucas-Kanade + Essential matrix)
+vel, ok = self.vo.estimate_velocity(img1, img2, dt=0.1)
+
+def compute_loss_with_delay(delta):
+    # Shift LiDAR points by velocity * time offset
+    t_compensated = self.t_base + (vel * delta).reshape(3, 1)
+    return average_alignment_loss(self.R, t_compensated, car_pts, mask)
+
+# Coarse grid search: ±150ms range
+deltas = np.linspace(-0.15, 0.15, 31)
+best_delta_coarse = deltas[np.argmin([compute_loss_with_delay(d) for d in deltas])]
+
+# Fine search around coarse best
+result = minimize_scalar(compute_loss_with_delay,
+                         bounds=(best_delta_coarse - 0.02,
+                                 best_delta_coarse + 0.02),
+                         method='bounded')</code></pre>
+</div>
+
+---
+
+## RESULTS
+
+
+
+<ul class="feature-list">
+  <li><strong>No targets:</strong> Cars in natural driving scenes serve as the calibration signal.</li>
+  <li><strong>Multi-frame averaging:</strong> Loss averaged across 7 frames (indices 0, 5, 10 … 30) for robustness to
+    per-frame segmentation noise.</li>
+  <li><strong>Validation dataset:</strong> KITTI raw sequence <code>2011_09_26 / drive 0005</code>.</li>
+  <li><strong>Temporal search range:</strong> ±150ms coarse grid → fine bounded minimization.</li>
+  <li><strong>Error metrics:</strong> ATD (Average Translation Difference in cm), QAD (Quaternion Angle Difference in
+    °), AEAD (Average Euler Angle Difference in °).</li>
+</ul>
+
+---
+
+## ANOMALY_REPORT
+
+<div class="alert-box alert-danger">
+  <h4>CHALLENGE: Segmentation-Only Car Points Cause Circular Dependency</h4>
+
+  <p><strong>ISSUE:</strong> The naive approach — project LiDAR points onto the image and label the ones that
+    land on the car mask — requires an approximate calibration to work. But we're <em>trying to find</em>
+    the calibration. This circular dependency meant the initial implementation produced corrupted car point
+    sets whenever the initial guess was poor.</p>
+
+  <p><strong>FIX:</strong> Two independent, decoupled pipelines. SalsaNext classifies car points directly
+    in the 3D point cloud with no knowledge of the camera. DeepLabV3 segments car pixels independently in
+    the image. They are only brought together during loss computation — no cross-modality look-up during
+    segmentation.</p>
+
+  <p><strong>OUTCOME:</strong> The optimization landscape becomes smooth and convex (verified via loss
+    landscape plots across ±15cm / ±5° perturbations), enabling L-BFGS-B to reliably converge from
+    perturbations of ~5cm translation and ~3° rotation to the ground-truth calibration.</p>
+</div>

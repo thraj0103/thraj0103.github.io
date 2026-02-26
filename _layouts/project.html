@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% include head.html %}
+</head>
+
+<body class="project-body">
+    <div class="point-cloud">
+        <canvas id="point-cloud-canvas"></canvas>
+    </div>
+
+    {% include header.html %}
+
+    <main class="project-main">
+        <!-- Project Header -->
+        <div class="project-header">
+            <div class="container">
+                <div class="project-header__breadcrumb">
+                    <a href="{{ '/' | relative_url }}#projects" class="back-link">← RETURN_TO_MISSION_LOGS</a>
+                </div>
+                <h1 class="project-header__title">// {{ page.title | upcase }}</h1>
+                <div class="project-header__id">[ {{ page.project_id }} ]</div>
+            </div>
+        </div>
+
+        <!-- Universal Hero Media Container -->
+        <div
+            class="hero-media-container {% if page.hero_video or page.hero_image %}hero-media-container--media{% else %}hero-media-container--data{% endif %} {% if page.hero_mode == 'mobile_uplink' %}hero-media-container--vertical{% endif %}">
+            {% if page.hero_video or page.hero_image %}
+            <!-- MEDIA MODE -->
+            <!-- Blurred Background Layer -->
+            <div class="hero-media-container__background">
+                {% if page.hero_video %}
+                <video class="hero-media-container__background-media" autoplay muted loop playsinline>
+                    <source src="{{ site.baseurl }}{{ page.hero_video }}" type="video/mp4">
+                </video>
+                {% elsif page.hero_image %}
+                <img src="{{ site.baseurl }}{{ page.hero_image }}" alt=""
+                    class="hero-media-container__background-media">
+                {% endif %}
+            </div>
+
+            <!-- Grid Overlay Pattern -->
+            <div class="hero-media-container__grid"></div>
+
+            <!-- Foreground Media (Centered) -->
+            <div class="hero-media-container__foreground">
+                {% if page.hero_video %}
+                <video class="hero-media-container__media" autoplay muted loop playsinline controls>
+                    <source src="{{ site.baseurl }}{{ page.hero_video }}" type="video/mp4">
+                </video>
+                {% elsif page.hero_image %}
+                <img src="{{ site.baseurl }}{{ page.hero_image }}" alt="{{ page.title }}"
+                    class="hero-media-container__media">
+                {% endif %}
+
+                <!-- Metadata Overlay -->
+                <div class="hero-media-container__metadata">
+                    {% if page.hero_feed_label %}
+                    [ FEED: {{ page.hero_feed_label }} ]
+                    {% elsif page.hero_video %}
+                    [ FEED_TYPE: RAW_FOOTAGE ]
+                    {% elsif page.hero_image %}
+                    [ FEED_TYPE: STATIC_CAPTURE ]
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <!-- DATA MODE (No Media) -->
+            <!-- Geometric Pattern Background -->
+            <div class="hero-media-container__pattern"></div>
+
+            <!-- Code Block Window (Centered) -->
+            <div class="hero-media-container__foreground">
+                <div class="hero-media-container__code-window">
+                    <div class="code-window__header">
+                        <span class="code-window__title">{{ page.code_snippet_title | default: "system_core.cpp"
+                            }}</span>
+                        <span class="code-window__status">● ACTIVE</span>
+                    </div>
+                    <pre class="code-window__content"><code>{% if page.code_snippet %}{{ page.code_snippet }}{% else %}// Autonomous Navigation System - Core Module
+class AutonomousNavigator {
+private:
+    RobotState current_state_;
+    PathPlanner* planner_;
+    ObstacleDetector* detector_;
+    
+public:
+    void execute() {
+        while (mission_active_) {
+            // Perception pipeline
+            auto obstacles = detector_->scan();
+            
+            // Path planning
+            auto path = planner_->compute(
+                current_state_.pose,
+                target_waypoint_,
+                obstacles
+            );
+            
+            // Control execution
+            controller_->follow(path);
+        }
+    }
+};{% endif %}</code></pre>
+                </div>
+
+                <!-- Metadata Overlay -->
+                <div class="hero-media-container__metadata">
+                    [ FEED_TYPE: RAW_DATA_STREAM ]
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Split-Screen Layout -->
+        <div class="container">
+            <div class="project-layout">
+                <!-- Left Sidebar (Sticky) -->
+                <aside class="project-sidebar">
+                    <!-- Data Points -->
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-section__title">[ DATA_POINTS ]</h3>
+                        <div class="sidebar-section__content">
+                            {% if page.role %}
+                            <div class="data-point">
+                                <span class="data-point__label">ROLE:</span>
+                                <span class="data-point__value">{{ page.role }}</span>
+                            </div>
+                            {% endif %}
+                            {% if page.timeline %}
+                            <div class="data-point">
+                                <span class="data-point__label">TIMELINE:</span>
+                                <span class="data-point__value">{{ page.timeline }}</span>
+                            </div>
+                            {% endif %}
+                            {% if page.platform %}
+                            <div class="data-point">
+                                <span class="data-point__label">PLATFORM:</span>
+                                <span class="data-point__value">{{ page.platform }}</span>
+                            </div>
+                            {% endif %}
+                            {% if page.status %}
+                            <div class="data-point">
+                                <span class="data-point__label">STATUS:</span>
+                                <span class="data-point__value status-{{ page.status | downcase }}">{{ page.status |
+                                    upcase }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Tech Stack -->
+                    {% if page.tech_stack %}
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-section__title">[ TECH_STACK ]</h3>
+                        <div class="sidebar-section__content">
+                            <div class="tech-tags">
+                                {% for tech in page.tech_stack %}
+                                <span class="tech-tag">{{ tech | upcase }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Source Uplink -->
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-section__title">[ SOURCE_UPLINK ]</h3>
+                        <div class="sidebar-section__content">
+                            {% if page.github_url %}
+                            <a href="{{ page.github_url }}" target="_blank"
+                                class="uplink-button uplink-button--primary">
+                                <span class="uplink-button__icon">▸</span>
+                                <span class="uplink-button__text">VIEW GITHUB REPO</span>
+                            </a>
+                            {% endif %}
+                            {% if page.paper_url %}
+                            <a href="{{ page.paper_url }}" target="_blank"
+                                class="uplink-button uplink-button--secondary">
+                                <span class="uplink-button__icon">▸</span>
+                                <span class="uplink-button__text">READ PAPER</span>
+                            </a>
+                            {% endif %}
+                            {% if page.demo_url %}
+                            <a href="{{ page.demo_url }}" target="_blank"
+                                class="uplink-button uplink-button--secondary">
+                                <span class="uplink-button__icon">▸</span>
+                                <span class="uplink-button__text">VIEW DEMO</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Right Content Area (Scrollable) -->
+                <article class="project-content">
+                    {{ content }}
+                </article>
+            </div>
+        </div>
+    </main>
+
+    {% include footer.html %}
+</body>
+
+</html>

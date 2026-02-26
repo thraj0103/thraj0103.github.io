@@ -1,82 +1,181 @@
 ---
-layout: default
+layout: project
 title: Beacon-Based Localization for Multi-Sensor Fusion SLAM
+project_id: EXP-24.01
 permalink: /projects/beacon-slam.html
+
+role: Course Project
+timeline: Fall 2024
+platform: TurtleBot3 Waffle, ROS 2
+status: Completed
+
+tech_stack:
+- ROS 2
+- RTAB-Map
+- Particle Filter
+- LiDAR + IMU Fusion
+- Gazebo
+- RViz
+
+# System pipeline diagram as hero (Fig. 2 from report):
+hero_image: /img/featured/beacon-slam/pipeline.png
+# hero_video: /video/beacon-slam-demo.mp4
 ---
 
-<div class="project-nav">
-  <a href="{{ " /" | relative_url }}#projects" class="back-link">← Back to Projects</a>
+## MISSION_OBJECTIVE
+
+<div class="content-block">
+    <p><strong>TARGET:</strong> Design and implement a beacon-aided localization module that integrates with an existing
+        Multi-Sensor Fusion SLAM stack to address drift and pose estimation failures in GPS-denied, feature-sparse
+        indoor environments.</p>
+
+    <p><strong>CONSTRAINT:</strong> The system must operate in real-time on a TurtleBot3 Waffle running ROS 2, fusing
+        data from static RF beacons, wheel odometry, IMU, and LiDAR into a single consistent pose estimate without
+        replacing the core SLAM backbone.</p>
 </div>
 
+---
 
+## SYSTEM_ARCHITECTURE
 
-<div class="container project-detail-container">
-  <div class="project-detail">
-    <!-- Project Header (left blue title stays intact) -->
-    <h1>Beacon-Based Localization for Multi-Sensor Fusion SLAM</h1>
+### [ HARDWARE_CONFIG ]
 
-    <!-- Two-column Layout (text left, media right) -->
-    <div class="project-layout">
+<ul class="feature-list">
+    <li><strong>Platform:</strong> TurtleBot3 Waffle Pi (Differential Drive) — simulated in Gazebo.</li>
+    <li><strong>LiDAR:</strong> LDS-01 360° scan for mapping and loop closure via RTAB-Map.</li>
+    <li><strong>IMU:</strong> Onboard inertial unit for orientation and motion prediction.</li>
+    <li><strong>Beacons:</strong> Static beacons at known positions; robot subscribes to range measurements over ROS
+        2 topics.</li>
+</ul>
 
-      <!-- Left Column: Text -->
-      <div class="project-content">
-        <p>
-          I integrated a <strong>beacon-based global correction</strong> module into an RTAB-Map SLAM pipeline in
-          <strong>ROS 2</strong>
-          to handle <strong>GNSS-denied</strong> and feature-sparse environments. A <strong>particle filter</strong>
-          fuses wheel/IMU odometry
-          with distance measurements from fixed beacons to correct drift and stabilize the robot’s global pose.
-        </p>
+### [ TWO-LAYER FUSION PIPELINE ]
 
-        <h3>System Architecture</h3>
-        <ul>
-          <li><strong>SLAM Backbone:</strong> RTAB-Map (RGB-D/LiDAR) for online mapping and loop closure.</li>
-          <li><strong>Beacon Layer:</strong> Static beacons broadcast IDs; the robot subscribes to range messages.</li>
-          <li><strong>Fusion:</strong> Particle filter combines odometry + beacon ranges for pose correction.</li>
-          <li><strong>Integration:</strong> ROS 2 nodes for beacon I/O, fusion, and TF corrections feeding back into
-            SLAM.</li>
-        </ul>
+<div class="content-block">
+    <p>The system implements sensor fusion in a hierarchical two-layer architecture:</p>
+</div>
 
-        <h3>Fusion Details</h3>
-        <ul>
-          <li>Propagate particles with odometry; weight by range residuals to known beacon locations.</li>
-          <li>Resample and publish the corrected pose to the SLAM graph for drift mitigation.</li>
-          <li>Tuned update rates to maintain real-time performance on TurtleBot3 class hardware.</li>
-        </ul>
+<ul class="feature-list">
+    <li><strong>Layer 1 — Particle Filter:</strong> Fuses wheel odometry with beacon distance measurements to
+        generate a
+        drift-corrected global pose estimate. This layer directly combats odometry slip and open-area drift.</li>
+    <li><strong>Layer 2 — RTAB-Map:</strong> Takes the corrected pose from Layer 1 and fuses it with LiDAR and IMU
+        data
+        using Bayesian filtering to produce the final map and trajectory. Leverages loop closure for long-term
+        consistency.</li>
+</ul>
 
-        <h3>Evaluation</h3>
-        <ul>
-          <li><strong>Simulation:</strong> Gazebo + RViz on TurtleBot3 with configurable beacon layouts.</li>
-          <li><strong>Comparisons:</strong> RTAB-Map alone vs. RTAB-Map + beacons; Cartographer (LiDAR-only) as
-            reference.</li>
-        </ul>
-
-        <h3>Results</h3>
-        <ul>
-          <li>Reduced long-term drift and better trajectory alignment when visual features were sparse or repetitive.
-          </li>
-          <li>Stable global pose under occlusions and partial loop-closure failures.</li>
-        </ul>
-
-        <h3>Stack</h3>
-        <div class="tech-stack">ROS 2 · RTAB-Map · Particle Filter · LiDAR/RGB-D · TF · Gazebo · RViz · TurtleBot3</div>
-      </div>
-
-      <!-- Right Column: Media (image or video) -->
-      <div class="project-media">
-        <!-- If you have a short demo video, keep this. Otherwise swap for an image tag. -->
-        <video autoplay muted loop playsinline preload="auto" controls>
-          <source src="{{ site.baseurl }}/video/beacon-slam-demo.mp4" type="video/mp4">
-          Sorry, your browser doesn’t support embedded videos.
-        </video>
-
-        <!-- Fallback image (uncomment if no video)
-      <img src="{{ site.baseurl }}/img/featured/beacon-slam/overlay-map-rtabmap.jpg"
-           alt="RTAB-Map with beacon correction overlay"
-           >
-      -->
-      </div>
-
+<div class="figure-row">
+    <div class="figure-cell">
+        <img src="/img/featured/beacon-slam/pipeline.png" alt="System Pipeline Block Diagram">
+        <figcaption>FIG_1.0: SYSTEM_PIPELINE — Two-layer sensor fusion architecture</figcaption>
     </div>
-  </div>
+    <div class="figure-cell">
+        <img src="/img/featured/beacon-slam/sim_env.png" alt="Gazebo Simulation Environment">
+        <figcaption>FIG_1.1: SIMULATION_ENV — Indoor house environment in Gazebo</figcaption>
+    </div>
+</div>
+
+---
+
+## EXECUTION_LOG
+
+### 1. Particle Filter Localization
+
+<p>Based on findings from comparative literature, the Particle Filter was selected over EKF and triangulation
+    approaches for superior accuracy under sensor noise. The algorithm maintains a distribution of particles — each
+    a
+    hypothetical robot pose — and iteratively weights them against beacon range measurements.</p>
+
+<div class="code-window">
+    <div class="code-window__header">
+        <span class="code-window__title">particle_filter.py</span>
+        <span class="code-window__status">● ACTIVE</span>
+    </div>
+    <pre class="code-window__content"><code>def update_particles(particles, odometry, beacons, sigma):
+    for p in particles:
+        # Motion update: propagate with Gaussian noise
+        p.x += odometry.dx * cos(p.theta) + gauss(0, sigma_x)
+        p.y += odometry.dx * sin(p.theta) + gauss(0, sigma_y)
+        p.theta += odometry.dtheta + gauss(0, sigma_theta)
+        # Weight by beacon range residuals
+        p.weight = 1.0
+        for beacon, z in zip(beacons.positions, beacons.ranges):
+            d = hypot(p.x - beacon.x, p.y - beacon.y)
+            p.weight *= exp(-((d - z)**2) / (2 * sigma**2))
+    normalize(particles)
+    if neff(particles) < 0.5 * len(particles):
+        resample(particles)
+    return weighted_mean(particles)  # Corrected pose -> RTAB-Map</code></pre>
+</div>
+
+### 2. Gaussian Motion Model
+
+<p>Each particle's state is propagated using odometry increments with additive Gaussian noise to model real-world
+    motion uncertainty:</p>
+
+<div class="math-block">
+    $$x^i_t = x^i_{t-1} + \Delta x \cos(\theta^i_{t-1}) - \Delta y \sin(\theta^i_{t-1}) + \mathcal{N}(0,
+    \sigma^2_x)$$
+    $$y^i_t = y^i_{t-1} + \Delta x \sin(\theta^i_{t-1}) + \Delta y \cos(\theta^i_{t-1}) + \mathcal{N}(0,
+    \sigma^2_y)$$
+    $$\theta^i_t = \theta^i_{t-1} + \Delta\theta + \mathcal{N}(0, \sigma^2_\theta)$$
+</div>
+
+### 3. Beacon Weight Update
+
+<p>Particle weights are updated using a Gaussian likelihood function comparing expected vs. measured beacon ranges:
+</p>
+
+<div class="math-block">
+    $$w^i_t \propto \exp\!\left(-\frac{(d_{i,j} - Z_j)^2}{2\sigma^2}\right)$$
+    <p style="font-size: 0.85rem; margin-top: 10px; color: #8899aa;">where $d_{i,j} = \|X^i - B_j\|$ is the
+        Euclidean
+        distance from particle $i$ to beacon $j$, and $Z_j$ is the measured range.</p>
+</div>
+
+---
+
+## RESULTS_ANALYSIS
+
+### Map Quality Comparison
+
+<p>The proposed Multi-Sensor Fusion SLAM was benchmarked against Cartographer SLAM (LiDAR + odometry only) in an
+    indoor Gazebo simulation of a house environment.</p>
+
+<div class="figure-row">
+    <div class="figure-cell">
+        <img src="/img/featured/beacon-slam/map_cartographer.png" alt="Cartographer SLAM Map">
+        <figcaption>FIG_2.0: MAP — Cartographer SLAM (baseline)</figcaption>
+    </div>
+    <div class="figure-cell">
+        <img src="/img/featured/beacon-slam/map_fusion.png" alt="Sensor Fusion SLAM Map">
+        <figcaption>FIG_2.1: MAP — Proposed Multi-Sensor Fusion SLAM</figcaption>
+    </div>
+</div>
+
+<ul class="feature-list">
+    <li><strong>Cartographer:</strong> Walls and corridors are reasonably structured in feature-rich regions, but
+        open/feature-sparse areas show distortions, grey undefined zones, and cumulative trajectory drift.</li>
+    <li><strong>Sensor Fusion SLAM:</strong> Produces sharper corners, well-defined boundaries, and a trajectory
+        that
+        closely follows the ground truth — thanks to beacon reference points eliminating open-area drift.</li>
+</ul>
+
+---
+
+## ANOMALY_REPORT
+
+<div class="alert-box alert-danger">
+    <h4>KNOWN LIMITATION: Static Beacon Dependency</h4>
+
+    <p><strong>ISSUE:</strong> The system relies on a pre-deployed, static beacon network. In large-scale or dynamic
+        environments, deploying and maintaining a dense beacon grid is impractical. Signal occlusion or interference
+        degrades range measurements and can destabilize the particle filter.</p>
+
+    <p><strong>IMPACT:</strong> The system is currently limited to 2D planar navigation. Uneven terrain, multi-floor
+        environments, or exoplanetary surfaces are outside current scope.</p>
+
+    <p><strong>FUTURE MITIGATION:</strong> Dynamic beacons capable of autonomously repositioning to optimize
+        coverage —
+        reducing the required beacon count while preserving localization accuracy.</p>
 </div>

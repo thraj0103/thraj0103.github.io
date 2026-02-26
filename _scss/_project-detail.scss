@@ -1,129 +1,1001 @@
-.project-detail-container {
-    padding: 120px 0;
+// ============================================================================
+// PROJECT DETAIL PAGES - "DECLASSIFIED TECHNICAL REPORT" LAYOUT
+// ============================================================================
+
+.project-body {
+    background: $void;
 }
 
-.project-nav {
+.project-main {
+    padding-top: 80px; // Account for fixed header
+}
+
+// ============================================================================
+// PROJECT HEADER
+// ============================================================================
+
+.project-header {
+    background: linear-gradient(180deg, rgba($gunmetal, 0.95) 0%, rgba($void, 0.8) 100%);
+    border-bottom: 1px solid rgba($cyan, 0.3);
+    padding: 40px 0 30px;
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            repeating-linear-gradient(0deg,
+                transparent,
+                transparent 2px,
+                rgba($cyan, 0.02) 2px,
+                rgba($cyan, 0.02) 4px);
+        pointer-events: none;
+    }
+
+    &__breadcrumb {
+        margin-bottom: 20px;
+
+        .back-link {
+            font-family: $font-mono;
+            font-size: 0.85rem;
+            color: $teal;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            display: inline-block;
+
+            &:hover {
+                color: $cyan;
+                text-shadow: 0 0 8px rgba($cyan, 0.6);
+                transform: translateX(-5px);
+            }
+        }
+    }
+
+    &__title {
+        font-family: $font-mono;
+        font-size: clamp(1.5rem, 4vw, 2.5rem);
+        font-weight: 700;
+        color: $white;
+        margin: 0 0 15px 0;
+        letter-spacing: 1px;
+        text-shadow: 0 0 20px rgba($cyan, 0.3);
+    }
+
+    &__id {
+        font-family: $font-mono;
+        font-size: 1rem;
+        color: $amber;
+        letter-spacing: 2px;
+        opacity: 0.9;
+    }
+}
+
+// ============================================================================
+// UNIVERSAL HERO MEDIA CONTAINER
+// ============================================================================
+
+.hero-media-container {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+    min-height: 400px;
+    overflow: hidden;
+    background: $void;
+
+    // Blurred Background Layer
+    &__background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    &__background-media {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: blur(20px) brightness(0.4);
+        transform: scale(1.1); // Prevent blur edge artifacts
+    }
+
+    // Pixel Grid Overlay
+    &__grid {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        background-image:
+            linear-gradient(rgba($cyan, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba($cyan, 0.03) 1px, transparent 1px);
+        background-size: 20px 20px;
+        pointer-events: none;
+    }
+
+    // Foreground Container
+    &__foreground {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+    }
+
+    // Centered Media (Video or Image)
+    &__media {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        border: 1px solid $cyan;
+        box-shadow:
+            0 0 20px rgba($cyan, 0.3),
+            0 10px 40px rgba($void, 0.8);
+        border-radius: 2px;
+
+        // Subtle glow animation
+        animation: mediaGlow 3s ease-in-out infinite;
+    }
+
+    // Metadata Overlay (Bottom-right)
+    &__metadata {
+        position: absolute;
+        bottom: 50px;
+        right: 50px;
+        font-family: $font-mono;
+        font-size: 11px;
+        color: $cyan;
+        background: rgba($void, 0.9);
+        padding: 6px 12px;
+        border: 1px solid rgba($cyan, 0.4);
+        border-radius: 2px;
+        letter-spacing: 0.5px;
+        text-shadow: 0 0 8px rgba($cyan, 0.6);
+        backdrop-filter: blur(10px);
+        z-index: 4;
+    }
+
+    // Responsive adjustments
+    @media (max-width: 768px) {
+        height: 50vh;
+        min-height: 300px;
+
+        &__foreground {
+            padding: 20px;
+        }
+
+        &__metadata {
+            bottom: 20px;
+            right: 20px;
+            font-size: 9px;
+            padding: 4px 8px;
+        }
+    }
+}
+
+// Media glow animation
+@keyframes mediaGlow {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 20px rgba($cyan, 0.3),
+            0 10px 40px rgba($void, 0.8);
+    }
+
+    50% {
+        box-shadow:
+            0 0 30px rgba($cyan, 0.5),
+            0 10px 40px rgba($void, 0.8);
+    }
+}
+
+// ============================================================================
+// SPLIT-SCREEN LAYOUT
+// ============================================================================
+
+.project-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 60px;
+    padding: 60px 0;
+    position: relative;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+
+// ============================================================================
+// LEFT SIDEBAR (STICKY)
+// ============================================================================
+
+.project-sidebar {
+    position: sticky;
+    top: 120px; // Account for header height
+    align-self: start;
+    max-height: calc(100vh - 140px);
+
+    @media (max-width: 1024px) {
+        position: static;
+        max-height: none;
+    }
+}
+
+.sidebar-section {
     margin-bottom: 40px;
 
-    .back-link {
-        display: inline-flex;
-        align-items: center;
-        color: $text;
+    &__title {
         font-family: $font-mono;
-        font-size: 0.9rem;
-        padding: 8px 16px;
-        background: rgba($accent, 0.1);
-        border: 1px solid rgba($accent, 0.3);
-        transition: all 0.3s ease;
-        text-decoration: none;
+        font-size: 0.75rem;
+        color: $cyan;
+        letter-spacing: 1.5px;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba($cyan, 0.3);
+        text-shadow: 0 0 8px rgba($cyan, 0.4);
+    }
 
-        clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), 0 100%, 0 0);
+    &__content {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+}
 
-        &:hover {
-            background: rgba($accent, 0.2);
-            color: $accent;
-            border-color: $accent;
-            padding-left: 20px; // Slide effect
+// Data Points
+.data-point {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-family: $font-mono;
+    font-size: 0.85rem;
+
+    &__label {
+        color: $teal;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        opacity: 0.8;
+    }
+
+    &__value {
+        color: $silver;
+        font-weight: 500;
+
+        &.status-active {
+            color: $cyan;
+            text-shadow: 0 0 6px rgba($cyan, 0.5);
+        }
+
+        &.status-completed {
+            color: $teal;
+        }
+
+        &.status-ongoing {
+            color: $amber;
         }
     }
 }
 
-.project-detail {
-    h1 {
-        color: $primary;
-        margin-bottom: 40px;
+// Tech Tags
+.tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tech-tag {
+    font-family: $font-mono;
+    font-size: 0.7rem;
+    color: $cyan;
+    background: rgba($cyan, 0.1);
+    border: 1px solid rgba($cyan, 0.3);
+    padding: 6px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background: rgba($cyan, 0.2);
+        border-color: rgba($cyan, 0.5);
+        box-shadow: 0 0 10px rgba($cyan, 0.3);
+    }
+}
+
+// Uplink Buttons
+.uplink-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    font-family: $font-mono;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-decoration: none;
+    border: 2px solid;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+
+    &__icon {
+        font-size: 1rem;
+        transition: transform 0.3s ease;
     }
 
-    .project-layout {
-        display: flex;
-        gap: 50px;
-        align-items: flex-start;
-
-        @media (max-width: 900px) {
-            flex-direction: column;
-        }
+    &__text {
+        flex: 1;
     }
 
-    .project-content {
-        flex: 2;
-        @include chamfered-hud($primary);
-        padding: 30px;
-        background-color: rgba($surface, 0.85);
+    // Primary button (GitHub)
+    &--primary {
+        color: $cyan;
+        border-color: $cyan;
+        background: rgba($cyan, 0.05);
 
-        h3 {
-            font-size: 1.5rem;
-            color: $text;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid rgba($primary, 0.3);
-            padding-bottom: 10px;
-            display: block; // Changed to block for full width underline
-            font-family: $font-heading;
-        }
+        &:hover {
+            background: rgba($cyan, 0.15);
+            box-shadow: 0 0 20px rgba($cyan, 0.4), inset 0 0 20px rgba($cyan, 0.1);
+            transform: translateY(-2px);
 
-        ul {
-            list-style: none; // Remove bullets for tech look
-            padding-left: 0;
-            margin-bottom: 20px;
-
-            li {
-                margin-bottom: 10px;
-                color: $text-secondary;
-                padding-left: 20px;
-                position: relative;
-
-                &::before {
-                    content: '>';
-                    position: absolute;
-                    left: 0;
-                    color: $accent;
-                    font-family: $font-mono;
-                    font-weight: bold;
-                }
+            .uplink-button__icon {
+                transform: translateX(5px);
             }
         }
 
-        p {
-            margin-bottom: 20px;
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba($cyan, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        &:hover::before {
+            left: 100%;
+        }
+    }
+
+    // Secondary buttons (Paper, Demo)
+    &--secondary {
+        color: $teal;
+        border-color: $teal;
+        background: rgba($teal, 0.05);
+
+        &:hover {
+            background: rgba($teal, 0.15);
+            box-shadow: 0 0 15px rgba($teal, 0.3);
+            transform: translateY(-2px);
+
+            .uplink-button__icon {
+                transform: translateX(5px);
+            }
+        }
+    }
+}
+
+// ============================================================================
+// RIGHT CONTENT AREA
+// ============================================================================
+
+.project-content {
+    color: $silver;
+    font-size: 1rem;
+    line-height: 1.8;
+
+    // Section Headings (// SECTION_NAME format)
+    h2 {
+        font-family: $font-mono;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: $cyan;
+        margin: 60px 0 25px 0;
+        letter-spacing: 1px;
+        text-shadow: 0 0 10px rgba($cyan, 0.4);
+        position: relative;
+        padding-left: 20px;
+
+        &::before {
+            content: '//';
+            position: absolute;
+            left: 0;
+            color: $teal;
+            opacity: 0.6;
+        }
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+
+    h3 {
+        font-family: $font-heading;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: $white;
+        margin: 40px 0 20px 0;
+        letter-spacing: 0.5px;
+    }
+
+    h4 {
+        font-family: $font-heading;
+        font-size: 1rem;
+        font-weight: 600;
+        color: $teal;
+        margin: 30px 0 15px 0;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    // Paragraphs
+    p {
+        margin-bottom: 20px;
+        color: $silver;
+    }
+
+    // Lists
+    ul,
+    ol {
+        margin: 20px 0;
+        padding-left: 30px;
+
+        li {
+            margin-bottom: 12px;
+            color: $silver;
+
+            &::marker {
+                color: $cyan;
+            }
+        }
+    }
+
+    // Strong/Bold text
+    strong {
+        color: $white;
+        font-weight: 600;
+    }
+
+    // Code inline
+    code {
+        font-family: $font-mono;
+        font-size: 0.9em;
+        color: $cyan;
+        background: rgba($cyan, 0.1);
+        padding: 2px 6px;
+        border-radius: 2px;
+        border: 1px solid rgba($cyan, 0.2);
+    }
+
+    // Code blocks
+    pre {
+        background: rgba($void, 0.8);
+        border: 1px solid rgba($cyan, 0.3);
+        border-radius: 4px;
+        padding: 20px;
+        margin: 25px 0;
+        overflow-x: auto;
+        position: relative;
+
+        // Terminal-style header
+        &::before {
+            content: attr(data-lang);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba($cyan, 0.1);
+            border-bottom: 1px solid rgba($cyan, 0.3);
+            padding: 6px 15px;
+            font-family: $font-mono;
+            font-size: 0.7rem;
+            color: $teal;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        code {
+            display: block;
+            margin-top: 35px;
+            background: none;
+            border: none;
+            padding: 0;
+            color: $silver;
+            font-size: 0.9rem;
             line-height: 1.6;
         }
     }
 
-    .project-media {
-        flex: 1;
-        position: sticky;
-        top: 100px;
-        @include chamfered-hud($accent); // Use accent color for media container
-        padding: 10px; // Tight padding for media
-        background-color: rgba($surface, 0.85);
+    // Images
+    img {
+        width: 100%;
+        height: auto;
+        border: 1px solid rgba($cyan, 0.4);
+        border-radius: 2px;
+        margin: 30px 0 10px 0;
+        box-shadow: 0 4px 15px rgba($cyan, 0.2);
+        transition: all 0.3s ease;
 
-        video,
-        img {
-            width: 100%;
-            display: block;
-            // No border needed as container has it
-            box-shadow: none;
-            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); // Consistent inner clip
+        &:hover {
+            border-color: rgba($cyan, 0.6);
+            box-shadow: 0 6px 25px rgba($cyan, 0.3);
+        }
+
+        // Blueprint/inverted style
+        &.blueprint {
+            filter: invert(1) hue-rotate(180deg);
         }
     }
 
-    .tech-stack {
-        margin-top: 40px;
-        padding: 20px;
-        background: rgba($primary, 0.05);
-        border: 1px solid rgba($primary, 0.3);
-        border-left: 4px solid $primary;
+    // Figure captions
+    figcaption,
+    .figure-caption {
         font-family: $font-mono;
-        color: $accent;
-        position: relative;
+        font-size: 0.75rem;
+        color: $cyan;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 10px 0 30px 0;
+        opacity: 0.8;
+    }
 
-        &::before {
-            content: 'STACK_INIT >>';
-            display: block;
-            font-size: 0.7rem;
-            color: $text-secondary;
-            margin-bottom: 5px;
-            opacity: 0.7;
+    // Videos
+    video {
+        width: 100%;
+        height: auto;
+        border: 1px solid rgba($cyan, 0.4);
+        border-radius: 2px;
+        margin: 30px 0;
+        box-shadow: 0 4px 15px rgba($cyan, 0.2);
+    }
+
+    // Blockquotes
+    blockquote {
+        border-left: 3px solid $cyan;
+        padding-left: 20px;
+        margin: 25px 0;
+        font-style: italic;
+        color: $teal;
+        background: rgba($cyan, 0.05);
+        padding: 15px 20px;
+        border-radius: 2px;
+    }
+
+    // Tables
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 30px 0;
+        font-family: $font-mono;
+        font-size: 0.9rem;
+
+        thead {
+            background: rgba($cyan, 0.1);
+            border-bottom: 2px solid rgba($cyan, 0.4);
+
+            th {
+                padding: 12px 15px;
+                text-align: left;
+                color: $cyan;
+                font-weight: 600;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                font-size: 0.75rem;
+            }
         }
+
+        tbody {
+            tr {
+                border-bottom: 1px solid rgba($cyan, 0.2);
+                transition: background 0.2s ease;
+
+                &:hover {
+                    background: rgba($cyan, 0.05);
+                }
+            }
+
+            td {
+                padding: 12px 15px;
+                color: $silver;
+            }
+        }
+    }
+
+    // Horizontal rule
+    hr {
+        border: none;
+        height: 1px;
+        background: linear-gradient(to right, transparent, rgba($cyan, 0.4), transparent);
+        margin: 40px 0;
+    }
+
+    // Links
+    a {
+        color: $cyan;
+        text-decoration: none;
+        border-bottom: 1px solid rgba($cyan, 0.3);
+        transition: all 0.3s ease;
+
+        &:hover {
+            color: $white;
+            border-bottom-color: $cyan;
+            text-shadow: 0 0 8px rgba($cyan, 0.6);
+        }
+    }
+}
+// ============================================================================
+// DATA MODE (No Media Fallback)
+// ============================================================================
+
+.hero-media-container--data {
+    // Geometric Pattern Background
+    .hero-media-container__pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        background-color: $void;
+        background-image: 
+            radial-gradient(circle at 25% 25%, rgba($cyan, 0.05) 2%, transparent 2%),
+            radial-gradient(circle at 75% 75%, rgba($teal, 0.05) 2%, transparent 2%),
+            radial-gradient(circle at 25% 75%, rgba($cyan, 0.03) 1.5%, transparent 1.5%),
+            radial-gradient(circle at 75% 25%, rgba($teal, 0.03) 1.5%, transparent 1.5%);
+        background-size: 60px 60px;
+        background-position: 0 0, 30px 30px, 0 30px, 30px 0;
+        animation: patternPulse 8s ease-in-out infinite;
+    }
+
+    // Code Window Container
+    .hero-media-container__code-window {
+        max-width: 800px;
+        width: 90%;
+        background: rgba($void, 0.95);
+        border: 1px solid $cyan;
+        border-radius: 4px;
+        box-shadow: 
+            0 0 30px rgba($cyan, 0.4),
+            0 20px 60px rgba($void, 0.9);
+        overflow: hidden;
+        animation: codeWindowGlow 3s ease-in-out infinite;
+    }
+
+    // Code Window Header
+    .code-window__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        background: rgba($gunmetal, 0.8);
+        border-bottom: 1px solid rgba($cyan, 0.3);
+    }
+
+    .code-window__title {
+        font-family: $font-mono;
+        font-size: 13px;
+        color: $cyan;
+        letter-spacing: 0.5px;
+    }
+
+    .code-window__status {
+        font-family: $font-mono;
+        font-size: 11px;
+        color: $teal;
+        text-shadow: 0 0 8px rgba($teal, 0.8);
+    }
+
+    // Code Content
+    .code-window__content {
+        margin: 0;
+        padding: 24px;
+        background: transparent;
+        overflow-x: auto;
+        max-height: 400px;
+
+        code {
+            font-family: $font-mono;
+            font-size: 14px;
+            line-height: 1.6;
+            color: $cyan;
+            text-shadow: 0 0 4px rgba($cyan, 0.3);
+            white-space: pre;
+            display: block;
+        }
+
+        // Custom scrollbar
+        &::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: rgba($gunmetal, 0.3);
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgba($cyan, 0.4);
+            border-radius: 4px;
+
+            &:hover {
+                background: rgba($cyan, 0.6);
+            }
+        }
+    }
+
+    // Responsive
+    @media (max-width: 768px) {
+        .hero-media-container__code-window {
+            width: 95%;
+        }
+
+        .code-window__content {
+            padding: 16px;
+
+            code {
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+// Pattern pulse animation
+@keyframes patternPulse {
+    0%, 100% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+// Code window glow animation
+@keyframes codeWindowGlow {
+    0%, 100% {
+        box-shadow: 
+            0 0 30px rgba($cyan, 0.4),
+            0 20px 60px rgba($void, 0.9);
+    }
+    50% {
+        box-shadow: 
+            0 0 40px rgba($cyan, 0.6),
+            0 20px 60px rgba($void, 0.9);
+    }
+}
+
+// ============================================================================
+// MOBILE UPLINK MODE (Vertical Video)
+// ============================================================================
+
+.hero-media-container--vertical {
+    .hero-media-container__media {
+        // Enforce vertical aspect ratio constraints
+        width: auto;
+        height: 90%;
+        aspect-ratio: 9/16;
+        max-width: 400px;
+        border: 2px solid $cyan;
+        box-shadow: 
+            0 0 30px rgba($cyan, 0.4),
+            0 20px 60px rgba($void, 0.8);
+        border-radius: 4px;
+        
+        @media (max-width: 768px) {
+            max-width: 80%;
+            height: auto;
+            max-height: 80vh;
+        }
+    }
+    
+    // Adjust metadata position for vertical layout
+    .hero-media-container__metadata {
+        bottom: 30px;
+        right: 30px;
+    }
+}
+
+// ============================================================================
+// CONTENT FORMATTING UTILITIES
+// ============================================================================
+
+.content-block {
+    margin-bottom: 40px;
+    
+    p {
+        margin-bottom: 15px;
+        font-size: 1.05rem;
+    }
+}
+
+.split-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 40px;
+    align-items: center;
+    margin: 30px 0;
+    
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+    
+    .text-col {
+        p {
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            color: $silver;
+            
+            strong {
+                color: $cyan;
+            }
+        }
+    }
+}
+
+.hardware-thumbnail {
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border: 1px solid rgba($cyan, 0.4);
+    box-shadow: 0 0 20px rgba($cyan, 0.1);
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    
+    li {
+        background: rgba($cyan, 0.05);
+        border-left: 2px solid $cyan;
+        padding: 15px;
+        margin-bottom: 15px;
+        font-size: 0.95rem;
+        
+        strong {
+            color: $teal;
+            display: inline-block;
+            min-width: 120px;
+        }
+    }
+}
+
+.code-window {
+    background: rgba($void, 0.9);
+    border: 1px solid rgba($cyan, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 25px 0;
+    box-shadow: 0 10px 30px rgba($void, 0.5);
+    
+    &__header {
+        background: rgba($gunmetal, 0.8);
+        border-bottom: 1px solid rgba($cyan, 0.2);
+        padding: 8px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    &__title {
+        font-family: $font-mono;
+        font-size: 0.75rem;
+        color: $cyan;
+    }
+    
+    &__status {
+        font-family: $font-mono;
+        font-size: 0.65rem;
+        color: $teal;
+    }
+    
+    &__content {
+        margin: 0;
+        padding: 20px;
+        background: transparent;
+        border: none;
+        
+        code {
+            color: $silver;
+            font-family: $font-mono;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+    }
+}
+
+.math-block {
+    background: rgba($void, 0.6);
+    border: 1px dashed rgba($cyan, 0.2);
+    padding: 20px;
+    margin: 25px 0;
+    text-align: center;
+    font-size: 1.1rem;
+    color: $cyan;
+}
+
+.small-figure {
+    max-width: 600px;
+    margin: 30px auto;
+    
+    img {
+        border: 1px solid rgba($cyan, 0.5);
+    }
+}
+
+.alert-box {
+    background: rgba($void, 0.8);
+    border: 1px solid;
+    padding: 25px;
+    border-radius: 2px;
+    margin: 30px 0;
+    
+    h4 {
+        margin-top: 0;
+        border-bottom: 1px solid rgba($white, 0.1);
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    
+    &.alert-danger {
+        border-color: #ff5555; // Red border for alerts
+        box-shadow: 0 0 20px rgba(255, 85, 85, 0.1);
+        
+        h4 {
+            color: #ff5555;
+        }
+    }
+    
+    .code-font {
+        font-family: $font-mono;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 10px;
+        margin: 15px 0;
+        color: $cyan;
+    }
+}
+
+// Side-by-side figure row
+.figure-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 30px 0;
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.figure-cell {
+    img {
+        width: 100%;
+        border: 1px solid rgba($cyan, 0.5);
+        border-radius: 2px;
+        box-shadow: 0 0 15px rgba($cyan, 0.15);
+    }
+
+    figcaption {
+        font-family: $font-mono;
+        font-size: 0.7rem;
+        color: $cyan;
+        text-align: center;
+        letter-spacing: 1px;
+        margin-top: 8px;
+        opacity: 0.8;
     }
 }

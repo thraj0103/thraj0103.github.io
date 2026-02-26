@@ -1,115 +1,134 @@
 ---
-layout: default
-title: Human-Aware Navigation with TurtleBot3
+layout: project
+title: Human-Following Robot with TurtleBot3
+project_id: EXP-23.01
 permalink: /projects/human-following.html
+
+# Sidebar Metadata
+role: Robotics Research Intern
+location: IIIT Pune (CRSI Lab)
+timeline: May 2023 - July 2023
+platform: TurtleBot3 Waffle-Pi
+status: Completed
+
+# Tech Stack
+tech_stack:
+- ROS 2 Foxy
+- YOLOv8 + DeepSORT
+- Sliding Mode Control
+- LiDAR Fusion
+
+# Hero Media
+hero_video: /video/human-following-720p.mp4
+hero_mode: mobile_uplink
+hero_feed_label: LIVE_TRACKING_TEST
 ---
 
+## MISSION_OBJECTIVE
 
-<div class="project-nav">
-  <a href="{{ " /" | relative_url }}#projects" class="back-link">← Back to Projects</a>
+<div class="content-block">
+    <p><strong>TARGET:</strong> Develop a Cyber-Physical System (CPS) capable of autonomously tracking and following a
+        specific human target in unstructured environments.</p>
+
+    <p><strong>CONSTRAINT:</strong> The system must maintain a fixed distance/angle and include a Fail-Safe Mechanism to
+        detect sensor faults or stealthy cyber-attacks.</p>
 </div>
 
+---
 
-<div class="container project-detail-container">
-  <div class="project-detail">
+## SYSTEM_ARCHITECTURE
 
-    <!-- Project Header -->
-    <h1>Human-Following Robot with TurtleBot3</h1>
+### [ HARDWARE_CONFIG ]
 
-    <div class="section__content">
-      <!-- Two-column Layout -->
-      <div class="project-layout">
-
-        <!-- Left Column: Text -->
-        <div class="project-content">
-          <p>
-            I built a perception–control pipeline on a <strong>TurtleBot3 Waffle-Pi</strong> that ties together
-            <strong>real-time perception</strong>, <strong>LiDAR–camera fusion</strong>, and
-            <strong>closed-loop control</strong> using <strong>ROS&nbsp;2 Foxy</strong>. The robot detects and tracks a
-            person,
-            estimates the person's angle and distance relative to the robot, and generates smooth velocity commands.
-            An observer-based monitor runs in parallel to flag anomalies and faults early.
-          </p>
-
-          <h3>System Architecture</h3>
-          <ul>
-            <li><strong>Perception:</strong> <em>YOLOv8</em> detects people; <em>DeepSORT</em> keeps the same ID across
-              frames.</li>
-            <li><strong>Sensor Fusion:</strong> Camera detections are associated with <em>LiDAR</em> returns to estimate
-              the person's direction and distance in real time.</li>
-            <li><strong>Control:</strong> Implemented and compared a baseline feedback-linearization controller with
-              a <em>Sliding Mode Controller (SMC)</em>; SMC was chosen for human-following because it stayed smooth
-              and stable under noise and brief occlusions.</li>
-            <li><strong>Anomaly Detection:</strong> A sliding-mode style observer estimates the robot's state and
-              compares
-              it with sensors; adaptive thresholds raise a fault flag for drift, mis-tuned gains, or stealthy issues.
-            </li>
-            <li><strong>Integration:</strong> Modular ROS&nbsp;2 nodes (vision → fusion → control → diagnostics) with
-              RViz/Gazebo tooling.</li>
-          </ul>
-
-          <h3>Perception &amp; Fusion</h3>
-          <ul>
-            <li>YOLOv8 runs at real-time rates; DeepSORT keeps stable IDs through short occlusions.</li>
-            <li>Fusion publishes the person's position relative to the robot by combining camera boxes and LiDAR scans.
-            </li>
-            <li>Diagnostics topics expose detections, tracks, and pose estimates for fast debugging in RViz.</li>
-          </ul>
-
-          <h3>Closed-Loop Control</h3>
-          <ul>
-            <li><strong>Feedback Linearization (baseline):</strong> validated on circular and sinusoidal test paths in
-              Gazebo.</li>
-            <li><strong>SMC for Following:</strong> computes forward and turning commands from tracking errors; produced
-              smoother paths
-              and better disturbance rejection in practice.</li>
-            <li><strong>I/O:</strong> Inputs include odometry, IMU yaw, and fused person pose; output is
-              <code>/cmd_vel</code>.
-            </li>
-          </ul>
-
-          <h3>Anomaly Detection</h3>
-          <p>
-            The observer predicts what the robot's state should be and compares it to sensor readings. When the
-            difference
-            grows beyond an adaptive threshold, the node flags a potential problem—useful for catching sensor drift or
-            over-aggressive gains before behavior degrades.
-          </p>
-
-          <h3>Experiments</h3>
-          <ul>
-            <li><strong>Simulation:</strong> Gazebo for controller bring-up, trajectory tests, and end-to-end checks.
-            </li>
-            <li><strong>Hardware:</strong> Hallway trials on TurtleBot3 confirmed stable following and recovery after
-              brief occlusions.</li>
-          </ul>
-
-          <h3>Results</h3>
-          <ul>
-            <li>Reliable person detection and tracking with IDs maintained through short occlusions.</li>
-            <li>SMC delivered smoother motion than the baseline and handled sensor noise well.</li>
-            <li>The observer correctly flagged injected faults (e.g., too-high gains), enabling safe intervention.</li>
-          </ul>
-
-          <h3>Stack</h3>
-          <div class="tech-stack">
-            ROS&nbsp;2 Foxy · Python/C++ · OpenCV · PyTorch · YOLOv8 · DeepSORT · LiDAR · IMU · Gazebo · RViz ·
-            TurtleBot3
-          </div>
-
-        </div>
-
-        <!-- Right Column: Video -->
-        <div class="project-media">
-          <video id="human-following-video" autoplay muted loop playsinline preload="auto" controls
-            poster="{{ site.baseurl }}/img/featured/human-following/thumb.jpg"
-            onloadedmetadata="this.playbackRate=2.0;">
-            <source src="{{ site.baseurl }}/video/human-following-720p.mp4" type="video/mp4">
-            Sorry, your browser doesn't support embedded videos.
-          </video>
-        </div>
-
-      </div>
+<div class="split-layout">
+    <div class="text-col">
+        <p><strong>Core Unit:</strong> TurtleBot3 Waffle-Pi (Differential Drive).</p>
+        <p><strong>Vision:</strong> Raspberry Pi Camera V2 (60° FOV).</p>
+        <p><strong>Depth Perception:</strong> LDS-01 360° LiDAR.</p>
+        <p><strong>Compute:</strong> Onboard Raspberry Pi 4 (ROS 2 Foxy).</p>
     </div>
-  </div>
+    <div class="image-col">
+        <img src="/img/featured/human-following/device.jpg" class="hardware-thumbnail"
+            alt="TurtleBot3 Waffle-Pi Hardware">
+    </div>
+</div>
+
+### [ SOFTWARE_PIPELINE ]
+
+<ul class="feature-list">
+    <li><strong>Perception:</strong> YOLOv8 detects humans $\rightarrow$ DeepSORT assigns unique IDs for temporal
+        tracking.</li>
+    <li><strong>Sensor Fusion:</strong> Camera provides the bearing (angle); LiDAR provides the precise depth by fusing
+        scan ranges within the target's bounding box.</li>
+    <li><strong>Control:</strong> A Sliding Mode Controller (SMC) calculates linear ($v$) and angular ($\omega$)
+        velocities to minimize the error between the robot and the human.</li>
+</ul>
+
+---
+
+## EXECUTION_LOG
+
+### 1. Vision-LiDAR Fusion Logic
+
+<p>To get the precise location of the human, I mapped the 2D bounding box from the camera to the 360° LiDAR scan data.
+</p>
+
+<div class="code-window">
+    <div class="code-window__header">
+        <span class="code-window__title">distance_estimation.py</span>
+        <span class="code-window__status">● ACTIVE</span>
+    </div>
+    <pre class="code-window__content"><code class="language-python">def calc_angle_distance(laser_msg, detections):
+    # Map Center of Bounding Box to Angle
+    mid = img_width // 2
+    central_angle = (central_x - mid) * degrees_per_pixel
+    
+    # Extract LiDAR ranges corresponding to that angle
+    dist = laser_msg.ranges[angle_to_index(st_angle, en_angle)]
+    return process_readings(dist), central_angle</code></pre>
+</div>
+
+### 2. Sliding Mode Control (SMC) Implementation
+
+<p>Unlike standard PID, SMC was chosen for its robustness against disturbances and uncertainties. The control law forces
+    the robot's state
+    onto a sliding surface.</p>
+
+<div class="math-block">
+    $$v = -k_1 \cos(\theta) \tanh(e_x) - k_2 \sin(\theta) \tanh(e_y)$$
+    $$\omega = \frac{k_1}{L} \sin(\theta) \tanh(e_x) - \frac{k_2}{L} \cos(\theta) \tanh(e_y)$$
+</div>
+
+<p><strong>Result:</strong> SMC provided smoother trajectory tracking compared to Feedback Linearization in initial
+    tests. The odometry plots below are recorded directly from the test run shown in the video above.</p>
+
+<div class="figure-row">
+    <div class="figure-cell">
+        <img src="/img/featured/human-following/test_human.png" alt="Human Path Log">
+        <figcaption>FIG_1.0: HUMAN_ODOMETRY_PATH</figcaption>
+    </div>
+    <div class="figure-cell">
+        <img src="/img/featured/human-following/test_bot.png" alt="Robot Path Log">
+        <figcaption>FIG_1.1: ROBOT_ODOMETRY_PATH</figcaption>
+    </div>
+</div>
+
+---
+
+## ANOMALY_REPORT
+
+<div class="alert-box alert-danger">
+    <h4>INCIDENT: Controller Instability via Stealthy Attack</h4>
+
+    <p><strong>SCENARIO:</strong> During testing, a "stealthy attack" was simulated by artificially inflating the
+        controller gains ($k_1, k_2$), causing the velocity commands to exceed physical safety limits ($v > 0.22 m/s$).
+    </p>
+
+    <p><strong>COUNTERMEASURE:</strong> I implemented an Adaptive Threshold Observer. The system estimates the robot's
+        expected state ($\hat{x}$) and compares it to the actual sensor state ($x$).</p>
+
+    <p class="code-font">If $|x - \hat{x}| > \text{Adaptive Threshold}$, a <strong>FAULT FLAG</strong> is triggered.</p>
+
+    <p><strong>Outcome:</strong> The system successfully detected the gain manipulation and halted the robot before
+        erratic motion occurred.</p>
 </div>

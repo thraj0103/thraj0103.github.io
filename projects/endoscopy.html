@@ -1,50 +1,150 @@
 ---
-layout: default
-title: Medical Endoscopy Simulation with Hardware-in-the-Loop RL
+layout: project
+title: Fiber-optic scan path optimization for Multiphoton Microendoscopy
+project_id: EXP-24.02
 permalink: /projects/endoscopy.html
+
+role: Core Contributor
+timeline: Fall 2024 - Present
+platform: Python, Gurobi Optimizer, SLURM HPC
+status: Mathematical Optimization Completed (RL Phase Pending)
+
+tech_stack:
+  - Integer Linear Programming
+  - Gurobi
+  - Scipy Sparse Matrices
+  - SLURM
+  - Python
+  - Microendoscopy
+
+github_url: https://github.com/Neu-Rai-Lab/sample-reconstruct-sim
+hero_image: /img/featured/endoscopy/scan_comparison.png
+
+code_snippet_title: "ilp_optimizer.py — Constrained ILP Setup"
+code_snippet: |
+    # Add coverage constraints ONLY for valid (masked) pixels
+    # Using scipy sparse CSC matrix to scale to 100K+ constraints
+    
+    for j in valid_indices:
+        start_ptr, end_ptr = indptr[j], indptr[j+1]
+        if start_ptr == end_ptr: continue
+        
+        col_indices = indices[start_ptr:end_ptr]
+        col_values = data[start_ptr:end_ptr]
+        
+        terms = [x[i] for i in col_indices]
+        constraint_expr = gp.LinExpr(col_values.tolist(), terms)
+        
+        # Ensure total Gaussian illumination contribution exceeds threshold
+        model.addConstr(constraint_expr >= threshold, name=f"cell_{j}")
 ---
 
-<div class="project-nav">
-  <a href="{{ " /" | relative_url }}#projects" class="back-link">← Back to Projects</a>
+<h2>MISSION_OBJECTIVE</h2>
+
+<div class="content-block">
+    <p><strong>TARGET:</strong> Eliminate uneven photobleaching in multiphoton microendoscopy by completely
+        restructuring the laser's physical scanning trajectory via global mathematical optimization.</p>
+
+    <p><strong>ISSUE:</strong> Conventional spiral scanning causes severe, irreversible fluorescence signal degradation
+        in living biological tissues due to photobleaching. The center of the spiral trajectory receives an inherently
+        excessive number of laser pulses relative to the edges, resulting in uneven bleaching and loss of image quality
+        over time. Our lab engineered a principled formulation to mathematically guarantee sufficient total illumination
+        per pixel while actively minimizing total laser exposure.
+    </p>
 </div>
 
+<hr>
 
+<h2>SYSTEM_ARCHITECTURE</h2>
 
-<div class="container project-detail-container">
-  <div class="project-detail">
-    <h1>Medical Endoscopy Simulation with Hardware-in-the-Loop RL</h1>
+<h3>[ OPTIMIZATION MODEL ]</h3>
+<p>A massive-scale Integer Linear Programming (ILP) framework targeting global illumination uniformity over the optical
+    fiber matrix:</p>
 
-    <div class="project-layout">
-      <div class="project-content">
-        <p>
-          At the <strong>Experimental Soft Robotics Lab (ESL)</strong>, I worked on developing a simulation framework
-          for
-          <strong>robotic endoscopy</strong>. The goal was to improve <strong>fiber-scanning patterns</strong> while
-          accounting for physical constraints like <strong>photobleaching</strong>.
-        </p>
+<ul class="feature-list">
+    <li><strong>Binary Decision Space:</strong> Over 200,000 algorithmic decision variables ($x_i \in \{0, 1\}$)
+        determining whether each discrete laser pulse is enabled or silenced during a single fiber sweep.</li>
+    <li><strong>Illumination Bounds:</strong> 100,000+ localized per-pixel coverage constraints ensuring the aggregate
+        2D Gaussian illumination contribution of active neighboring pulses meets a strict threshold $\Sigma(A_{ij}x_i)
+        \ge T$.</li>
+    <li><strong>Computational Scaling:</strong> Extracted radical performance optimizations utilizing spatial cutoff
+        mechanics for sparse constraints (reducing matrix density by ~95%), hash-based caching algorithms, and strict
+        circular array masking bounding computation to valid optics alone.</li>
+    <li><strong>SLURM Distribution:</strong> Leveraged Northeastern's High-Performance Computing cluster to execute
+        massive decoupled job arrays performing a 100-configuration parameter sweep tracking Gaussian widths against
+        varying exposure thresholds.</li>
+</ul>
 
-        <h3>Contributions</h3>
-        <ul>
-          <li>Modeled fiber-scanning endoscopy system dynamics in simulation.</li>
-          <li>Implemented <strong>hardware-in-the-loop RL</strong> to optimize scanning policies.</li>
-          <li>Tested methods to minimize photobleaching while maintaining image quality.</li>
-          <li>Collaborated with lab members on integrating real hardware with the simulation loop.</li>
-        </ul>
+<hr>
 
-        <h3>Outcomes</h3>
-        <ul>
-          <li>Pipeline established for connecting RL controllers to real endoscopy prototypes.</li>
-          <li>Promising early results on improved scan efficiency and reduced photobleaching effects.</li>
-        </ul>
+<h2>EXECUTION_LOG</h2>
 
-        <h3>Stack</h3>
-        <div class="tech-stack">Python · PyTorch · RL · Simulation · Hardware-in-the-Loop</div>
-      </div>
+<h3>1. Spatial Contributions and Dense Constraints</h3>
 
-      <div class="project-media">
-        <img src="{{ site.baseurl }}/img/featured/endoscopy/simulation.jpg" alt="Endoscopy simulation environment"
-          style="width:100%; height:auto; border-radius:8px;">
-      </div>
+<p>Every targeted laser pulse physically projects a spherical 2D Gaussian zone of influence across the imaging sensor
+    array. Naive algorithmic models simply accept the nearest pulses until their localized threshold is met (Greedy
+    baseline). While computationally cheap, this strategy severely over-exposes natively dense regions—such as the
+    center of a dense temporal spiral. Our model physically mapped the global photobleaching intensity accumulation
+    limits into thousands of bounded rows.</p>
+
+<div class="figure-cell" style="margin: 40px 0;">
+    <img src="/img/featured/endoscopy/sampled_points.png" alt="Sampled Points and Mask Verification"
+        style="max-width: 100%; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,255,255,0.1); border: 1px solid rgba(0,255,255,0.3);">
+    <figcaption>FIG_1.0: ILP Bounding Box and Sparse Target Mapping. Utilizing dynamic circular masking limits the ILP
+        execution boundaries purely to the physically active imaging core, vastly shedding redundant grid constraints.
+    </figcaption>
+</div>
+
+<h3>2. Gurobi Global Solver Engine</h3>
+
+<p>Because the configuration matrices expanded to hundreds of thousands of constraints per run, conventional linear
+    problem formulations overflowed API wrappers. The solver core bypasses standard declarative interfaces, translating
+    parameters to directly write sparse Scipy CSC coefficients explicitly into optimized <code>gp.LinExpr</code> memory
+    arrays.</p>
+
+<div class="code-window">
+    <div class="code-window__header">
+        <span class="code-window__title">ilp_optimizer.py — Objective Execution</span>
+        <span class="code-window__status">● ACTIVE</span>
     </div>
-  </div>
+    <pre class="code-window__content"><code>def solve(self, contribution_matrix, threshold, valid_mask):
+    model.setParam('MIPFocus', OptimizerConfig.MIP_FOCUS)
+    model.setParam('MIPGap', OptimizerConfig.MIP_GAP)
+    
+    # Define binary execution variables for every pulse coordinate
+    x = model.addVars(n_points, vtype=GRB.BINARY, name="x")
+    
+    # Global objective: Minimize total enabled laser pulses required
+    model.setObjective(gp.quicksum(x[i] for i in range(n_points)), GRB.MINIMIZE)
+    
+    # Attach 100K+ sparse illumination bounds compiled previously
+    self._add_constraints(model, x, contribution_matrix, threshold, valid_mask)
+    model.optimize()
+    
+    return np.array([i for i in range(n_points) if x[i].x > 0.5])</code></pre>
 </div>
+
+<hr>
+
+<h2>RESULTS_ANALYSIS</h2>
+
+<div class="figure-cell" style="margin: 40px 0;">
+    <img src="/img/featured/endoscopy/scan_comparison.png" alt="Optimized Pattern Comparison vs Baseline Spiral"
+        style="max-width: 100%; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,255,255,0.1); border: 1px solid rgba(0,255,255,0.3);">
+    <figcaption>FIG_2.0: Mathematical Trajectory Selection Results. The left profile displays the inherently saturated
+        dense center of a conventional uniform spiral. The right profile visualizes the final ILP isolation mask,
+        effectively stripping overlapping radial exposures while maintaining absolute pixel illumination consistency.
+    </figcaption>
+</div>
+
+<ul class="feature-list">
+    <li><strong>Pulse Reduction Profile:</strong> Formal Gurobi execution sweeps proved an exceptional <strong>47.0%
+            overall active pulse reduction</strong> metric while natively guaranteeing structural image similarity
+        ratios (SSIM=0.851).</li>
+    <li><strong>The Operational Pareto Frontier:</strong> Mass 100-parameter HPC job array analytics mathematically
+        charted full constraint boundaries revealing potential 80% to 90% redundant-pulse elimination potential
+        depending precisely on absolute user perception thresholds.</li>
+    <li><strong>Homogeneous Exposure Tuning:</strong> Post-analysis CDF evaluation arrays confirmed that mathematical
+        models drove peak pixel-saturation exposures off a catastrophic initial state (78.17 peak pulses/pixel) reliably
+        back down strictly to 1.59 peak pulses/pixel.</li>
+</ul>

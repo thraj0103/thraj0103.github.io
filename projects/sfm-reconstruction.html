@@ -1,0 +1,150 @@
+---
+layout: project
+title: Monocular 3D Reconstruction via Structure from Motion
+project_id: EXP-25.08
+permalink: /projects/sfm-reconstruction.html
+
+role: Course Project
+timeline: Fall 2025
+platform: Python, OpenCV
+status: Completed
+
+tech_stack:
+- Python
+- OpenCV
+- SIFT / SuperGlue
+- GTSAM
+- RANSAC
+- Bundle Adjustment
+
+github_url: https://github.com/thraj0103/3d-reconstruction-SfM
+
+hero_image: /img/featured/sfm-reconstruction/reconstruction.png
+---
+
+## MISSION_OBJECTIVE
+
+<div class="content-block">
+  <p><strong>TARGET:</strong> Reconstruct dense 3D geometry from 24 sequential monocular images of a Buddha
+    statue in a turntable configuration. Implement the full Structure from Motion pipeline from scratch —
+    feature matching, essential matrix estimation, pose recovery, triangulation, and bundle adjustment —
+    using only NumPy and OpenCV (no SfM library).</p>
+
+  <p><strong>KEY RESULT:</strong> 15,247 3D points reconstructed with a final mean reprojection error of
+    <strong>0.68 px</strong> after GTSAM bundle adjustment, achieving 99.2% cheirality constraint satisfaction
+    across all views.
+  </p>
+</div>
+
+---
+
+## SYSTEM_ARCHITECTURE
+
+### [ PIPELINE OVERVIEW ]
+
+<ul class="feature-list">
+  <li><strong>Feature Detector:</strong> SIFT with CLAHE contrast normalization + non-max suppression (NMS) for even
+    keypoint distribution. Optional SuperGlue for learned matching.</li>
+  <li><strong>Matching:</strong> Lowe's ratio test (threshold 0.8) + RANSAC (20,000 iterations, Sampson error metric)
+    for robust correspondence filtering.</li>
+  <li><strong>Geometry:</strong> 8-point algorithm with Hartley normalization → Essential matrix → 4 candidate pose
+    decompositions resolved by cheirality check.</li>
+  <li><strong>Triangulation:</strong> Direct Linear Transform (DLT) with feature track linking to avoid duplicate points
+    and multi-view color averaging.</li>
+  <li><strong>Global Optimization:</strong> GTSAM factor graph BA with Huber robust loss ($k=1.345$), fixed first camera
+    pose to resolve gauge freedom, 95th percentile outlier filtering.</li>
+</ul>
+
+---
+
+## EXECUTION_LOG
+
+### 1. Essential Matrix & Pose Recovery
+
+<p>Given matched keypoints $\mathbf{x}$ and $\mathbf{x}'$ between two views, the Essential matrix $E$ satisfies the
+  epipolar constraint. It is estimated via the normalized 8-point algorithm inside RANSAC:</p>
+
+<div class="math-block">
+  $${\mathbf{x}'}^T E\, \mathbf{x} = 0, \qquad E = [t]_\times R$$
+</div>
+
+<p>$E$ decomposes into 4 $(R, t)$ solutions — the correct one is selected by the cheirality check: all
+  triangulated points must have positive depth in both cameras.</p>
+
+### 2. DLT Triangulation
+
+<p>For each matched point pair $(x, x')$ observed in camera matrices $P$ and $P'$, the 3D point $X$ is recovered
+  via the homogeneous DLT system:</p>
+
+<div class="math-block">
+  $$A\mathbf{X} = 0, \quad A = \begin{bmatrix} x(P^{3T}) - P^{1T} \\ x'(P'^{3T}) - P'^{1T} \\ \ldots \end{bmatrix}$$
+</div>
+
+### 3. Bundle Adjustment — GTSAM
+
+<div class="code-window">
+  <div class="code-window__header">
+    <span class="code-window__title">bundle_adjustment.py</span>
+    <span class="code-window__status">● ACTIVE</span>
+  </div>
+  <pre class="code-window__content"><code>graph = gtsam.NonlinearFactorGraph()
+initial = gtsam.Values()
+
+noise = gtsam.noiseModel.Robust.Create(
+    gtsam.noiseModel.mEstimator.Huber.Create(1.345),  # outlier-robust
+    gtsam.noiseModel.Isotropic.Sigma(2, 1.0)
+)
+
+# Add reprojection factors for each (camera, 3D point, observation) triplet
+for cam_idx, pt_idx, uv_obs in observations:
+    graph.add(gtsam.GenericProjectionFactorCal3_S2(
+        uv_obs, noise, X(cam_idx), L(pt_idx), K
+    ))
+
+# Fix first camera to resolve gauge freedom
+graph.add(gtsam.PriorFactorPose3(X(0), initial_poses[0], prior_noise))
+
+result = gtsam.LevenbergMarquardtOptimizer(graph, initial).optimize()</code></pre>
+</div>
+
+---
+
+## RESULTS
+
+<div class="content-block">
+  <img src="/img/featured/sfm-reconstruction/reconstruction.png" alt="SuperGlue 3D Reconstruction"
+    style="width:100%; border: 1px solid rgba(0,230,230,0.4); border-radius: 2px; box-shadow: 0 0 20px rgba(0,230,230,0.15);">
+  <p
+    style="font-family: var(--font-mono); font-size:0.75rem; color: #0ee; text-align:center; margin-top:10px; letter-spacing:1px;">
+    FIG_1.0: 3D_RECONSTRUCTION — SuperGlue-matched point cloud, Buddha turntable dataset (24 views)
+  </p>
+</div>
+
+<ul class="feature-list">
+  <li><strong>3D Points:</strong> 15,247 reconstructed</li>
+  <li><strong>View Registration:</strong> 100% (24/24 images)</li>
+  <li><strong>Mean Reprojection Error:</strong> 0.68 px after BA (sub-pixel)</li>
+  <li><strong>Error Reduction from BA:</strong> 47% reduction</li>
+  <li><strong>Cheirality Satisfaction:</strong> 99.2% of all points</li>
+  <li><strong>Mean Track Length:</strong> 3.8 views/point — high multi-view consistency</li>
+</ul>
+
+---
+
+## ANOMALY_REPORT
+
+<div class="alert-box alert-danger">
+  <h4>CHALLENGE: Bundle Adjustment Convergence & Outliers</h4>
+
+  <p><strong>ISSUE:</strong> Initial triangulation contains outlier 3D points from poor matches or degenerate
+    configurations (near-parallel rays, small baseline). Including all points in BA leads to slow convergence
+    and can corrupt the optimized solution.</p>
+
+  <p><strong>SOLUTION:</strong> Two-stage filtering — (1) strict triangulation angle filtering (minimum 1°
+    baseline angle) during point creation, and (2) 95th percentile reprojection error filtering before BA to
+    discard gross outliers. Huber loss ($k=1.345$) within GTSAM further down-weights soft outliers during
+    optimization.</p>
+
+  <p><strong>OUTCOME:</strong> BA converges reliably to sub-pixel reprojection error across all 24 views with
+    no manual intervention — a 47% reduction from initial triangulation error.</p>
+</div>

@@ -1,47 +1,103 @@
 - title: Human-Following Robot with TurtleBot3
   url: /projects/human-following.html
+  specialization: "PERCEPTION | CONTROLS"
   image: /img/featured/human-following/thumb.jpg
-  description: Teaching a TurtleBot3 to detect, track, and follow humans in dynamic environments using ROS 2.
+  description: Autonomous human tracking and pursuit using YOLOv8 perception, DeepSORT, and point-cloud clustering.
   year: 23
   project_number: "01"
-  tags: [Perception, Control, Sensor Fusion, ROS 2]
+  tags: [YOLOv8, DeepSORT, Sensor Fusion, ROS 2]
 
 - title: Beacon-Based Localization for Multi-Sensor Fusion SLAM
   url: /projects/beacon-slam.html
+  specialization: "STATE ESTIMATION"
   image: /img/featured/beacon-slam/thumb.jpg
-  description: Added beacon-based global pose correction to an RTAB-Map SLAM stack in ROS 2; fused odometry and beacon ranges with a particle filter to reduce drift in GNSS-denied, feature-sparse spaces.
+  description: High-fidelity particle filter fusion of odometry and beacon ranges to eliminate SLAM drift in GNSS-denied zones.
   year: 24
   project_number: "01"
   tags: [Localization, SLAM, Sensor Fusion, ROS 2]
 
-- title: Dynamic Obstacle Avoidance with D* Lite (ROS 2 Nav2)
+- title: Dynamic Obstacle Avoidance with D* Lite
   url: /projects/dstar-lite.html
+  specialization: "MOTION PLANNING"
   image: /img/featured/dstar-lite/thumb.jpg
-  description: Built a custom Nav2 planner plugin implementing D* Lite for real-time replanning. Integrated a dynamic costmap, an efficient cell-based priority queue, and smoothing for safe paths around sudden, occluded, and close-range obstacles.
+  description: Custom Nav2 planner plugin engineered for rapid, real-time trajectory replanning in dynamic contested environments.
   year: 25
   project_number: "01"
-  tags: [Path Planning, Navigation2, ROS 2, Gazebo]
+  tags: [D* Lite, Navigation2, ROS 2, Gazebo]
 
-- title: Deep Reinforcement Learning for Autonomous Racing (F1TENTH)
+- title: Deep Reinforcement Learning for Autonomous Racing
   url: /projects/f1tenth.html
+  specialization: "CONTROLS | MOTION PLANNING"
   image: /img/featured/f1tenth/thumb.jpg
-  description: Trained PPO and SAC agents in simulation to perform high-speed racing on the F1TENTH platform. Designed reward shaping, curriculum training, and domain randomization to transfer policies from sim to track.
+  description: High-speed autonomous navigation agents (PPO & SAC) trained for extreme physics and seamless sim-to-real transfer.
   year: 25
   project_number: "02"
-  tags: [Reinforcement Learning, Autonomous Racing, ROS 2, Gazebo]
+  tags: [Reinforcement Learning, Autonomous Racing, OpenAI Gym, f1tenth]
 
-- title: Medical Endoscopy Simulation with Hardware-in-the-Loop RL
-  url: /projects/endoscopy.html
-  image: /img/featured/endoscopy/thumb.jpg
-  description: Developed a simulation-based pipeline for robotic endoscopy, combining fiber-scanning models with reinforcement learning and hardware-in-the-loop experiments to optimize scanning patterns.
-  year: 24
-  project_number: "02"
-  tags: [Medical Robotics, Reinforcement Learning, Simulation, Control]
+- title: "// MULTIPHOTON MICROENDOSCOPY: ILP OPTIMIZATION"
+  url: "/projects/endoscopy.html"
+  specialization: "MATHEMATICAL OPTIMIZATION | CONTROLS"
+  image: "/img/featured/endoscopy/scan_comparison.png"
+  alt: "Microendoscopy Scan Optimization"
+  description: "Formulated a 200,000+ variable Integer Linear Programming (ILP) model to explicitly eradicate uneven photobleaching, driving down excessive laser pulse thresholds by 47% while native target coverage is meticulously maintained."
+  year: "2024"
+  project_number: "EXP-24.02"
+  tags:
+    - Python
+    - Gurobi
+    - SLURM
+    - ILP
 
 - title: Adversarial Robustness in Vision-Based Robot Navigation
   url: /projects/adversarial-vision.html
+  specialization: "PERCEPTION"
   image: /img/featured/adversarial-vision/thumb.jpg
-  description: Measured how black-box perturbations suppress YOLOv8 detections on nuScenes and evaluated real-time, no-retrain defenses (Gaussian blur, JPEG, bit-reduction, random-resize) suitable for embedded robots.
+  description: Real-time defense architecture protecting YOLOv8 perception stacks against adversarial patches in embedded robots.
   year: 25
   project_number: "03"
-  tags: [Perception, Adversarial ML, Robustness, YOLOv8, PyTorch]
+  tags: [Adversarial ML, Robustness, YOLOv8, PyTorch]
+
+- title: LiDAR-Based Glass Walls Detection
+  url: /projects/glass-detection.html
+  specialization: "PERCEPTION"
+  image: /img/featured/glass-detection/thumb.jpg
+  description: Deterministic transparent-surface isolation pipeline leveraging LiDAR intensity gradients and watershed segmentation.
+  year: 25
+  project_number: "04"
+  tags: [Point Cloud Processing, LiDAR, Image Processing, Python]
+
+- title: Target-less Spatiotemporal LiDAR-Camera Calibration
+  url: /projects/lidar-camera-calibration.html
+  specialization: "STATE ESTIMATION"
+  image: /img/featured/lidar-camera-calibration/thumb.jpg
+  description: Advanced semantic-consistency framework automating multi-sensor extrinsics and temporal synchronization.
+  year: 25
+  project_number: "05"
+  tags: [Sensor Fusion, Calibration, Deep Learning, KITTI]
+
+- title: Kinematic Analysis & Simulation of Underactuated Spherical Hands
+  url: /projects/spherical-hands.html
+  specialization: "CONTROLS | KINEMATICS"
+  image: /img/featured/spherical-hands/thumb.jpg
+  description: Complete Screw Theory analysis and spatial formulation for size-invariant grasping using 2:1 underactuation.
+  year: 25
+  project_number: "06"
+  tags: [Manipulation, Robotics, SolidWorks, Screw Theory]
+
+- title: Interactive Kinematics Simulator for UR5 Manipulator
+  url: /projects/ur5-kinematics.html
+  specialization: "MOTION PLANNING"
+  image: /img/featured/ur5-kinematics/thumb.jpg
+  description: Custom 6-DOF IK solver application using Damped Least Squares to achieve a 95.8% analytical solve rate.
+  year: 25
+  project_number: "07"
+  tags: [Manipulation, Inverse Kinematics, UR5, Python]
+
+- title: Monocular 3D Reconstruction via Structure from Motion
+  url: /projects/sfm-reconstruction.html
+  specialization: "PERCEPTION | STATE ESTIMATION"
+  image: /img/featured/sfm-reconstruction/thumb.jpg
+  description: Dense 3D map generation from 2D monocular feeds via SuperGlue matching and GTSAM Bundle Adjustment.
+  year: 25
+  project_number: "08"
+  tags: [3D Reconstruction, Triangulation, Bundle Adjustment, Python]

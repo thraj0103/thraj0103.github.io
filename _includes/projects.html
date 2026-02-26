@@ -28,6 +28,13 @@
                     <a href="{{ project.url | relative_url }}">// {{ project.title | upcase }}</a>
                 </h3>
 
+                <!-- Specialization -->
+                {% if project.specialization %}
+                <div class="project-specialization">
+                    [ {{ project.specialization }} ]
+                </div>
+                {% endif %}
+
                 <!-- Divider -->
                 <div class="title-divider"></div>
 
